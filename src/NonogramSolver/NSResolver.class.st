@@ -13,7 +13,8 @@ Class {
 NSResolver class >> on: aDOM [ 
 	^ self new
 		on: aDOM;
-		resolve
+		resolve;
+		solution
 ]
 
 { #category : #'as yet unclassified' }
@@ -27,20 +28,24 @@ socket.addEventListener("open", function (event) {
 
 // Listen for messages
 socket.addEventListener("message", function (event) {
-    console.log("Message from server ", event.data);
-});'.
+    const filled = JSON.parse(event.data);
+	filled.forEach(check)
+});
+
+function check(value, index, array) {
+	var clickEvent = document.createEvent ("MouseEvents");
+	clickEvent.initEvent ("mousedown", true, true);
+	document.getElementById(value).dispatchEvent (clickEvent);
+}'.
 	'ZnServer stopDefault.
 ZnServer startDefaultOn: 1801.
 ZnServer default delegate: (ZnWebSocketDelegate handler:
    [ :webSocket |
       [ webSocket runWith: [ :message |
-		NSSolver on: message.
-         webSocket sendMessage: ''Todo'' ]
+		webSocket sendMessage: (NSResolver on: message) ]
       ]
       on: ConnectionClosed
-      do: [ self crLog: ''Ignoring connection close, done'' ] ]).
-
-'
+      do: [  ] ])'
 ]
 
 { #category : #'as yet unclassified' }
@@ -50,12 +55,12 @@ NSResolver >> at: anInteger at: anInteger2 put: aState [
 
 { #category : #accessing }
 NSResolver >> clueForColumn: columnIndex [
-	^ verticalClues at: columnIndex
+	^ horizontalClues at: columnIndex
 ]
 
 { #category : #accessing }
 NSResolver >> clueForLine: lineIndex [
-	^ horizontalClues at: lineIndex
+	^ verticalClues at: lineIndex
 ]
 
 { #category : #testing }
@@ -99,6 +104,15 @@ NSResolver >> on: aDOM [
 
 { #category : #'as yet unclassified' }
 NSResolver >> resolve [
-	NSAbstractSolver solvers do: [ :solver | solver resolve: self ] separatedBy: [ self isResolved ifTrue: [ 1halt ] ].
-	1halt.
+	NSAbstractSolver solvers do: [ :solver | solver resolve: self ] separatedBy: [ self isResolved ifTrue: [ ^ self ] ]
+]
+
+{ #category : #'as yet unclassified' }
+NSResolver >> solution [
+	| filled |
+	filled := OrderedCollection new.
+	1 to: grid numberOfColumns do: [ :columnIndex | 
+		1 to: grid numberOfLines do: [ :lineIndex |
+			(grid at: lineIndex at: columnIndex) isFilled ifTrue: [ filled add: 'nmf' , (columnIndex - 1) asString , '_' , (lineIndex - 1) asString ] ] ].
+	^ STONJSON toString: filled asArray
 ]

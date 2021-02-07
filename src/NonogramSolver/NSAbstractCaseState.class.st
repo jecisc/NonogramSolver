@@ -5,6 +5,11 @@ Class {
 }
 
 { #category : #testing }
+NSAbstractCaseState class >> isFilled [
+	^ false
+]
+
+{ #category : #testing }
 NSAbstractCaseState class >> isKnown [
 	^ true
 ]

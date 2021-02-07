@@ -14,9 +14,14 @@ NSGrid class >> width: anInteger height: anInteger2 [
 		yourself
 ]
 
+{ #category : #accessing }
+NSGrid >> at: lineIndex at: columnIndex [ 
+	^ content at: lineIndex at: columnIndex 
+]
+
 { #category : #'as yet unclassified' }
-NSGrid >> at: anInteger at: anInteger2 put: aState [ 
-	content at: anInteger at: anInteger2 put: aState 
+NSGrid >> at: lineIndex at: columnIndex put: aState [ 
+	content at: lineIndex at: columnIndex put: aState 
 ]
 
 { #category : #testing }
@@ -65,6 +70,6 @@ NSGrid >> width [
 ]
 
 { #category : #initialization }
-NSGrid >> width: anInteger height: anInteger2 [
-	content := Array2D rows: anInteger columns: anInteger2 element: NSUnknownState
+NSGrid >> width: numberOfColumns height: numberOfLines [
+	content := Array2D rows: numberOfLines columns: numberOfColumns element: NSUnknownState
 ]
