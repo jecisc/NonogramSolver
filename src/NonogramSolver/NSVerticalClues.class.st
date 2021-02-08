@@ -12,6 +12,6 @@ NSVerticalClues >> buildFrom: aXMLElement [
 	clues := Array new: lines size.
 	1 to: clues size do: [ :index | clues at: index put: OrderedCollection new ].
 	lines doWithIndex: [ :line :lineIndex | 
-		line nodes do: [ :node | node contentString = ' ' ifFalse: [ (clues at: lineIndex) add: node contentString asNumber ] ].
+		line nodes do: [ :node | node contentString = ' ' ifFalse: [ (clues at: lineIndex) add: (NSClue clue: node contentString asNumber) ] ].
  ]
 ]

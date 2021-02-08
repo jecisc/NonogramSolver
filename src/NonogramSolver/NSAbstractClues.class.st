@@ -24,6 +24,11 @@ NSAbstractClues >> buildFrom: arg1 [
 	^ self subclassResponsibility
 ]
 
+{ #category : #enumerating }
+NSAbstractClues >> do: aBlockClosure [ 
+	clues do: aBlockClosure
+]
+
 { #category : #accessing }
 NSAbstractClues >> size [
 	^ clues size

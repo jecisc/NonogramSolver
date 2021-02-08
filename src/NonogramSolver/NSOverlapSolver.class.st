@@ -11,27 +11,58 @@ NSOverlapSolver class >> priority [
 
 { #category : #resolving }
 NSOverlapSolver >> resolve [
-	self flag: #todo. "Use already filled items on the line. Use empty cases on the line."
-	self withUnfinishedLinesDo: [ :lineIndex :lineClue |
-		| beginToEndInterval endToBeginInterval counter |
-		beginToEndInterval := Array new: lineClue size.
-		endToBeginInterval := Array new: lineClue size.
-		
-		counter := 1.
-		lineClue doWithIndex: [ :clue :index | beginToEndInterval at: index put: (counter to: counter + clue - 1). counter := counter + clue + 1 ].
-		counter := self numberOfColumns.
-		lineClue reverse doWithIndex: [ :clue :index | endToBeginInterval at: lineClue size - index + 1 put: (counter - clue + 1 to: counter). counter := counter - clue - 1 ].
-		
-		beginToEndInterval with: endToBeginInterval do: [ :int1 :int2 | (int1 intersection: int2) do: [ :index | self at: lineIndex at: index put: NSFilledState ]  ]. ].
+	self flag: #todo.	"Use already filled items on the line. Use empty cases on the line."
+	self
+		withUnfinishedLinesDo: [ :lineIndex :clues | 
+			| beginToEndInterval endToBeginInterval counter |
+			beginToEndInterval := Array new: clues size.
+			endToBeginInterval := Array new: clues size.
 
-	self withUnfinishedColumnsDo: [ :columnIndex :columnClue | | beginToEndInterval endToBeginInterval counter |
-		beginToEndInterval := Array new: columnClue size.
-		endToBeginInterval := Array new: columnClue size.
-		
-		counter := 1.
-		columnClue doWithIndex: [ :clue :index | beginToEndInterval at: index put: (counter to: counter + clue - 1). counter := counter + clue + 1 ].
-		counter := self numberOfLines.
-		columnClue reverse doWithIndex: [ :clue :index | endToBeginInterval at: columnClue size - index + 1 put: (counter - clue + 1 to: counter). counter := counter - clue - 1 ].
+			counter := 1.
+			clues
+				doWithIndex: [ :clue :index | 
+					beginToEndInterval at: index put: (counter to: counter + clue value - 1).
+					counter := counter + clue value + 1 ].
+			counter := self numberOfColumns.
+			clues reverse
+				doWithIndex: [ :clue :index | 
+					endToBeginInterval at: clues size - index + 1 put: (counter - clue value + 1 to: counter).
+					counter := counter - clue value - 1 ].
 
-		beginToEndInterval with: endToBeginInterval do: [ :int1 :int2 | (int1 intersection: int2) do: [ :index | self at: index at: columnIndex put: NSFilledState ]  ]. ].
+			counter := 1.
+			beginToEndInterval
+				with: endToBeginInterval
+				do: [ :int1 :int2 | 
+					| interval |
+					interval := int1 intersection: int2.
+					interval do: [ :index | self at: lineIndex at: index put: NSFilledState ].
+					interval size = (clues at: counter) value ifTrue: [ (clues at: counter) solved ]. "if the interval matches the full clue, then the clue is solved."
+					counter := counter + 1 ] ].
+
+	self
+		withUnfinishedColumnsDo: [ :columnIndex :clues | 
+			| beginToEndInterval endToBeginInterval counter |
+			beginToEndInterval := Array new: clues size.
+			endToBeginInterval := Array new: clues size.
+
+			counter := 1.
+			clues
+				doWithIndex: [ :clue :index | 
+					beginToEndInterval at: index put: (counter to: counter + clue value - 1).
+					counter := counter + clue value + 1 ].
+			counter := self numberOfLines.
+			clues reverse
+				doWithIndex: [ :clue :index | 
+					endToBeginInterval at: clues size - index + 1 put: (counter - clue value + 1 to: counter).
+					counter := counter - clue value - 1 ].
+
+			counter := 1.
+			beginToEndInterval
+				with: endToBeginInterval
+				do: [ :int1 :int2 | 
+					| interval |
+					interval := int1 intersection: int2.
+					interval do: [ :index | self at: index at: columnIndex put: NSFilledState ].
+					interval size = (clues at: counter) value ifTrue: [ (clues at: counter) solved ]. "if the interval matches the full clue, then the clue is solved."
+					counter := counter + 1 ]  ]
 ]
