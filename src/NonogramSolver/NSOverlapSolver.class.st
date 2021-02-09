@@ -39,5 +39,5 @@ NSOverlapSolver >> lookForOverlapForClues: clues axisSize: axisSize currentIndex
 { #category : #resolving }
 NSOverlapSolver >> resolve [
 	self withUnfinishedLinesDo: [ :lineIndex :clues | self lookForOverlapForClues: clues axisSize: self numberOfColumns currentIndex: lineIndex ].
-	self withUnfinishedColumnsDo: [ :columnIndex :clues | 1halt. self lookForOverlapForClues: clues axisSize: self numberOfLines currentIndex: columnIndex ]
+	self withUnfinishedColumnsDo: [ :columnIndex :clues | self lookForOverlapForClues: clues axisSize: self numberOfLines currentIndex: columnIndex ]
 ]

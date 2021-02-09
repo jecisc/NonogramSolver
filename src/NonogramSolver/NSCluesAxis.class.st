@@ -16,8 +16,8 @@ NSCluesAxis class >> cluesList: aClueList [
 ]
 
 { #category : #adding }
-NSCluesAxis >> add: aNSClue [ 
-	^ clues add: aNSClue
+NSCluesAxis >> addClue: aValue [
+	clues add: (NSClue clue: aValue asNumber axis: self)
 ]
 
 { #category : #accessing }
@@ -81,14 +81,33 @@ NSCluesAxis >> ifLineClues: aBlockClosure ifColumnClues: aBlockClosure2 [
 ]
 
 { #category : #accessing }
+NSCluesAxis >> index [
+	^ cluesList indexOf: self
+]
+
+{ #category : #accessing }
 NSCluesAxis >> indexOf: aNSClue [ 
-	^ clues indexOf: (clues detect: [ :c | c includes: aNSClue ])
+	^ clues indexOf: aNSClue
 ]
 
 { #category : #initialization }
 NSCluesAxis >> initialize [
 	super initialize.
 	clues := OrderedCollection new
+]
+
+{ #category : #printing }
+NSCluesAxis >> printOn: aStream [
+	super printOn: aStream.
+	
+	aStream
+		space;
+		print: (clues collect: #value) asArray
+]
+
+{ #category : #accessing }
+NSCluesAxis >> reverse [
+	^ clues reverse
 ]
 
 { #category : #accessing }

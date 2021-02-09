@@ -19,7 +19,7 @@ NSResolver class >> on: aDOM [
 
 { #category : #'as yet unclassified' }
 NSResolver class >> scripts [
-	'const socket = new WebSocket("ws://localhost:1801");
+	'const socket = new WebSocket("ws://localhost:1802");
 
 // Connection opened
 socket.addEventListener("open", function (event) {
@@ -38,7 +38,7 @@ function check(value, index, array) {
 	document.getElementById(value).dispatchEvent (clickEvent);
 }'.
 	'ZnServer stopDefault.
-ZnServer startDefaultOn: 1801.
+ZnServer startDefaultOn: 1802.
 ZnServer default delegate: (ZnWebSocketDelegate handler:
    [ :webSocket |
       [ webSocket runWith: [ :message |

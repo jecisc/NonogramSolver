@@ -35,6 +35,11 @@ NSClue >> axis: anObject [
 	axis := anObject
 ]
 
+{ #category : #accessing }
+NSClue >> axisIndex [
+	^ axis index
+]
+
 { #category : #checking }
 NSClue >> checkIsSolved [
 	isSolved ifTrue: [ ^ true ].
@@ -44,8 +49,10 @@ NSClue >> checkIsSolved [
 	self solved.
 	possibleInterval do: [ :intervalIndex | 
 		self
-			ifLineClue: [ self grid at: self index at: intervalIndex put: NSFilledState ]
-			ifColumnClue: [ self grid at: intervalIndex at: self index put: NSFilledState ] ].
+			ifLineClue: [ self grid at: self axisIndex at: intervalIndex put: NSFilledState ]
+			ifColumnClue: [ self grid at: intervalIndex at: self axisIndex put: NSFilledState ] ].
+		
+	^ true
 ]
 
 { #category : #accessing }
