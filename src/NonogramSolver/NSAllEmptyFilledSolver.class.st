@@ -11,8 +11,5 @@ NSAllEmptyFilledSolver class >> priority [
 
 { #category : #resolve }
 NSAllEmptyFilledSolver >> resolve [
-	self
-		withUnfinishedLinesDo: [ :lineIndex :clues | clues ifEmpty: [ 1 to: self numberOfColumns do: [ :columnIndex | self at: lineIndex at: columnIndex put: NSEmptyState ] ] ].
-	self
-		withUnfinishedColumnsDo: [ :columnIndex :clues | clues ifEmpty: [ 1 to: self numberOfLines do: [ :lineIndex | self at: lineIndex at: columnIndex put: NSEmptyState ] ] ]
+	self withUnfinishedAxisDo: [ :axisIndex :clues :axisSize | clues ifEmpty: [ 1 to: axisSize do: [ :index | self axisAt: axisIndex at: index put: NSEmptyState for: clues ] ] ]
 ]

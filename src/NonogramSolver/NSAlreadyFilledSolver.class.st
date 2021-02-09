@@ -11,6 +11,5 @@ NSAlreadyFilledSolver class >> priority [
 
 { #category : #resolve }
 NSAlreadyFilledSolver >> resolve [
-	self withUnfinishedLinesDo: [ :lineIndex :clues | clues size = 1 ifTrue: [ clues anyOne checkIsSolved ] ].
-	self withUnfinishedColumnsDo: [ :columnIndex :clues | clues size = 1 ifTrue: [ clues anyOne checkIsSolved ] ]
+	self withUnfinishedAxisDo: [ :axisIndex :clues | clues size = 1 ifTrue: [ clues anyOne checkIsSolved ] ]
 ]

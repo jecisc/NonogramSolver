@@ -29,6 +29,11 @@ NSAbstractSolver >> at: anInteger at: anInteger2 put: aState [
 	resolver at: anInteger at: anInteger2 put: aState 
 ]
 
+{ #category : #resolve }
+NSAbstractSolver >> axisAt: axisIndex at: index put: aClass for: clues [
+	clues ifLineClues: [ self at: axisIndex at: index put: aClass ] ifColumnClues: [ self at: index at: axisIndex put: aClass ]
+]
+
 { #category : #accessing }
 NSAbstractSolver >> clueForColumn: columnIndex [ 
 	^ resolver clueForColumn: columnIndex
@@ -67,6 +72,13 @@ NSAbstractSolver >> resolve [
 { #category : #accessing }
 NSAbstractSolver >> resolver: aNSResolver [ 
 	resolver := aNSResolver
+]
+
+{ #category : #resolve }
+NSAbstractSolver >> withUnfinishedAxisDo: aBlock [
+	self
+		withUnfinishedLinesDo: aBlock;
+		withUnfinishedColumnsDo: aBlock
 ]
 
 { #category : #resolve }
