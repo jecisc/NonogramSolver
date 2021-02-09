@@ -9,8 +9,9 @@ NSLinesClues >> buildFrom: aXMLElement [
 	| lines |
 	self flag: #improve.
 	lines := aXMLElement nodes anyOne nodes anyOne nodes.
-	cluesAxis := NSCluesAxis ofSize: lines size cluesList: self.
-	lines doWithIndex: [ :line :index | line nodes do: [ :node | cluesAxis addClue: node contentString ifNeededAt: index ] ]
+	cluesAxis := Array ofSize: lines size.
+	1 to: cluesAxis size do: [ :index | cluesAxis at: index put: (NSCluesAxis cluesList: self) ].
+	lines doWithIndex: [ :line :index | line nodes do: [ :node | self addClue: node contentString ifNeededAt: index ] ]
 ]
 
 { #category : #testing }

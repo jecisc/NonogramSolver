@@ -16,6 +16,13 @@ NSCluesList class >> buildFrom: aXMLElement resolver: aResolver [
 		yourself
 ]
 
+{ #category : #initialization }
+NSCluesList >> addClue: aValue ifNeededAt: anIndex [
+	aValue = ' ' ifTrue: [ ^ self ].
+
+	(self at: anIndex) add: (NSClue clue: aValue asNumber axis: self)
+]
+
 { #category : #accessing }
 NSCluesList >> at: anInteger [
 	^ cluesAxis at: anInteger
@@ -49,6 +56,12 @@ NSCluesList >> grid [
 { #category : #testing }
 NSCluesList >> ifLineClues: aBlockClosure ifColumnClues: aBlockClosure2 [ 
 	^ self subclassResponsibility
+]
+
+{ #category : #initialization }
+NSCluesList >> initialize [
+	super initialize.
+	cluesAxis := OrderedCollection new
 ]
 
 { #category : #accessing }

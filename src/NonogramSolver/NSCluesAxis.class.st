@@ -9,18 +9,20 @@ Class {
 }
 
 { #category : #'instance creation' }
-NSCluesAxis class >> ofSize: anInteger cluesList: aClueList [
+NSCluesAxis class >> cluesList: aClueList [
 	^ self new
-		ofSize: anInteger;
 		cluesList: aClueList;
 		yourself
 ]
 
 { #category : #adding }
-NSCluesAxis >> addClue: aValue ifNeededAt: anIndex [
-	aValue = ' ' ifTrue: [ ^ self ].
+NSCluesAxis >> add: aNSClue [ 
+	^ clues add: aNSClue
+]
 
-	(self at: anIndex) add: (NSClue clue: aValue asNumber axis: self)
+{ #category : #accessing }
+NSCluesAxis >> anyOne [
+	^ clues anyOne
 ]
 
 { #category : #accessing }
@@ -58,9 +60,19 @@ NSCluesAxis >> do: aBlockClosure [
 	clues do: aBlockClosure
 ]
 
+{ #category : #'as yet unclassified' }
+NSCluesAxis >> doWithIndex: aBlockClosure [ 
+	^ clues doWithIndex: aBlockClosure
+]
+
 { #category : #accessing }
 NSCluesAxis >> grid [
 	^ cluesList grid
+]
+
+{ #category : #testing }
+NSCluesAxis >> ifEmpty: aBlockClosure [ 
+	^ clues ifEmpty: aBlockClosure 
 ]
 
 { #category : #testing }
@@ -73,10 +85,10 @@ NSCluesAxis >> indexOf: aNSClue [
 	^ clues indexOf: (clues detect: [ :c | c includes: aNSClue ])
 ]
 
-{ #category : #'instance creation' }
-NSCluesAxis >> ofSize: anInteger [
-	clues := Array new: anInteger.
-	1 to: anInteger do: [ :index | self at: index put: OrderedCollection new ]
+{ #category : #initialization }
+NSCluesAxis >> initialize [
+	super initialize.
+	clues := OrderedCollection new
 ]
 
 { #category : #accessing }

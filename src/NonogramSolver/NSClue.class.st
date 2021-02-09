@@ -104,6 +104,12 @@ NSClue >> printOn: aStream [
 ]
 
 { #category : #accessing }
+NSClue >> restrainPossibleIntervalWith: anInterval [ 
+	possibleInterval := ((possibleInterval min) max: anInterval min) to: ((possibleInterval max) min: anInterval max).
+	self checkIsSolved
+]
+
+{ #category : #accessing }
 NSClue >> solved [
 	isSolved := true
 ]
