@@ -96,6 +96,11 @@ NSCluesAxis >> initialize [
 	clues := OrderedCollection new
 ]
 
+{ #category : #enumeration }
+NSCluesAxis >> inject: aCollection into: aBlockClosure [ 
+	^ clues inject: aCollection into: aBlockClosure 
+]
+
 { #category : #printing }
 NSCluesAxis >> printOn: aStream [
 	super printOn: aStream.

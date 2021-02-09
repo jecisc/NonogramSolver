@@ -71,10 +71,10 @@ NSAbstractSolver >> resolver: aNSResolver [
 
 { #category : #resolve }
 NSAbstractSolver >> withUnfinishedColumnsDo: aBlock [
-	1 to: self numberOfColumns do: [ :columnIndex | (self columnIsAllKnown: columnIndex) ifFalse: [ aBlock value: columnIndex value: (self clueForColumn: columnIndex) ] ]
+	1 to: self numberOfColumns do: [ :columnIndex | (self columnIsAllKnown: columnIndex) ifFalse: [ aBlock cull: columnIndex cull: (self clueForColumn: columnIndex) cull: self numberOfLines ] ]
 ]
 
 { #category : #resolve }
 NSAbstractSolver >> withUnfinishedLinesDo: aBlock [
-	1 to: self numberOfLines do: [ :lineIndex | (self lineIsAllKnown: lineIndex) ifFalse: [ aBlock value: lineIndex value: (self clueForLine: lineIndex) ] ]
+	1 to: self numberOfLines do: [ :lineIndex | (self lineIsAllKnown: lineIndex) ifFalse: [ aBlock cull: lineIndex cull: (self clueForLine: lineIndex) cull: self numberOfColumns ] ]
 ]

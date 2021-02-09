@@ -38,6 +38,6 @@ NSOverlapSolver >> lookForOverlapForClues: clues axisSize: axisSize currentIndex
 
 { #category : #resolving }
 NSOverlapSolver >> resolve [
-	self withUnfinishedLinesDo: [ :lineIndex :clues | self lookForOverlapForClues: clues axisSize: self numberOfColumns currentIndex: lineIndex ].
-	self withUnfinishedColumnsDo: [ :columnIndex :clues | self lookForOverlapForClues: clues axisSize: self numberOfLines currentIndex: columnIndex ]
+	self withUnfinishedLinesDo: [ :lineIndex :clues :axisSize | self lookForOverlapForClues: clues axisSize: axisSize currentIndex: lineIndex ].
+	self withUnfinishedColumnsDo: [ :columnIndex :clues :axisSize | self lookForOverlapForClues: clues axisSize: axisSize currentIndex: columnIndex ]
 ]

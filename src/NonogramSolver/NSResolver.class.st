@@ -28,13 +28,18 @@ socket.addEventListener("open", function (event) {
 
 // Listen for messages
 socket.addEventListener("message", function (event) {
-    const filled = JSON.parse(event.data);
-	filled.forEach(check)
+	const data = JSON.parse(event.data);
+   data.filled.forEach(check);
+   data.empty.forEach(empty);
 });
 
 function check(value, index, array) {
-	var clickEvent = document.createEvent ("MouseEvents");
-	clickEvent.initEvent ("mousedown", true, true);
+	var clickEvent = new MouseEvent("mousedown", { view: window, button: 0});
+	document.getElementById(value).dispatchEvent (clickEvent);
+}
+
+function empty(value, index, array) {
+	var clickEvent = new MouseEvent("mousedown", { view: window, button: 2});
 	document.getElementById(value).dispatchEvent (clickEvent);
 }'.
 	'ZnServer stopDefault.
@@ -111,10 +116,15 @@ NSResolver >> resolve [
 
 { #category : #'as yet unclassified' }
 NSResolver >> solution [
-	| filled |
+	| result filled empty |
+	result := Dictionary new.
 	filled := OrderedCollection new.
+	empty := OrderedCollection new.
 	1 to: grid numberOfColumns do: [ :columnIndex | 
-		1 to: grid numberOfLines do: [ :lineIndex |
-			(grid at: lineIndex at: columnIndex) isFilled ifTrue: [ filled add: 'nmf' , (columnIndex - 1) asString , '_' , (lineIndex - 1) asString ] ] ].
-	^ STONJSON toString: filled asArray
+		1 to: grid numberOfLines do: [ :lineIndex | 
+			(grid at: lineIndex at: columnIndex) isFilled ifTrue: [ filled add: 'nmf' , (columnIndex - 1) asString , '_' , (lineIndex - 1) asString ].
+			(grid at: lineIndex at: columnIndex) isEmpty ifTrue: [ empty add: 'nmf' , (columnIndex - 1) asString , '_' , (lineIndex - 1) asString ] ] ].
+	result at: 'filled' put: filled asArray.
+	result at: 'empty' put: empty asArray.
+	^ STONJSON toString: result
 ]
