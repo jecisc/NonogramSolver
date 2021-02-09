@@ -1,35 +1,35 @@
 Class {
-	#name : #NSAbstractClues,
+	#name : #NSCluesList,
 	#superclass : #Object,
 	#instVars : [
-		'clues'
+		'cluesAxis'
 	],
 	#category : #NonogramSolver
 }
 
 { #category : #'instance creation' }
-NSAbstractClues class >> buildFrom: aXMLElement [ 
+NSCluesList class >> buildFrom: aXMLElement [ 
 	^ self new
 		buildFrom: aXMLElement;
 		yourself
 ]
 
 { #category : #accessing }
-NSAbstractClues >> at: anInteger [
-	^ clues at: anInteger
+NSCluesList >> at: anInteger [
+	^ cluesAxis at: anInteger
 ]
 
 { #category : #accessing }
-NSAbstractClues >> buildFrom: arg1 [ 
+NSCluesList >> buildFrom: arg1 [ 
 	^ self subclassResponsibility
 ]
 
 { #category : #enumerating }
-NSAbstractClues >> do: aBlockClosure [ 
-	clues do: aBlockClosure
+NSCluesList >> do: aBlockClosure [ 
+	cluesAxis do: aBlockClosure
 ]
 
 { #category : #accessing }
-NSAbstractClues >> size [
-	^ clues size
+NSCluesList >> size [
+	^ cluesAxis size
 ]

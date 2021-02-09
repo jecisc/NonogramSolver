@@ -97,8 +97,8 @@ NSResolver >> numberOfLines [
 NSResolver >> on: aDOM [ 
 	| document |
 	document := XMLHTMLParser parse: aDOM.
-	horizontalClues := NSHorizontalClues buildFrom: (document xPath: '//td[@class=''nmtt'']') anyOne.
-	verticalClues := NSVerticalClues buildFrom: (document xPath: '//td[@class=''nmtl'']') anyOne.
+	horizontalClues := NSLinesClues buildFrom: (document xPath: '//td[@class=''nmtt'']') anyOne.
+	verticalClues := NSColumnsClues buildFrom: (document xPath: '//td[@class=''nmtl'']') anyOne.
 	horizontalClues do: [ :clues | clues do: [ :clue | clue possibleInterval: (1 to: verticalClues size) ] ].
 	verticalClues do: [ :clues | clues do: [ :clue | clue possibleInterval: (1 to: horizontalClues size) ] ].
 	grid := NSGrid width: horizontalClues size height: verticalClues size
