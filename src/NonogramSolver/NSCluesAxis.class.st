@@ -58,6 +58,21 @@ NSCluesAxis >> do: aBlockClosure [
 	clues do: aBlockClosure
 ]
 
+{ #category : #accessing }
+NSCluesAxis >> grid [
+	^ cluesList grid
+]
+
+{ #category : #testing }
+NSCluesAxis >> ifLineClues: aBlockClosure ifColumnClues: aBlockClosure2 [ 
+	^ cluesList ifLineClues: aBlockClosure ifColumnClues: aBlockClosure2 
+]
+
+{ #category : #accessing }
+NSCluesAxis >> indexOf: aNSClue [ 
+	^ clues indexOf: (clues detect: [ :c | c includes: aNSClue ])
+]
+
 { #category : #'instance creation' }
 NSCluesAxis >> ofSize: anInteger [
 	clues := Array new: anInteger.
