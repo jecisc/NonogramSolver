@@ -16,6 +16,13 @@ NSCluesAxis class >> ofSize: anInteger cluesList: aClueList [
 		yourself
 ]
 
+{ #category : #adding }
+NSCluesAxis >> addClue: aValue ifNeededAt: anIndex [
+	aValue = ' ' ifTrue: [ ^ self ].
+
+	(self at: anIndex) add: (NSClue clue: aValue asNumber axis: self)
+]
+
 { #category : #accessing }
 NSCluesAxis >> at: anInteger [
 	^ clues at: anInteger

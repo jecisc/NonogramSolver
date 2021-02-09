@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'possibleInterval',
 		'isSolved',
-		'value'
+		'value',
+		'axis'
 	],
 	#category : #NonogramSolver
 }
@@ -14,6 +15,24 @@ NSClue class >> clue: anInteger [
 	^ self new
 		value: anInteger;
 		yourself
+]
+
+{ #category : #'instance creation' }
+NSClue class >> clue: anInteger axis: anAxis [
+	^ self new
+		value: anInteger;
+		axis: anAxis;
+		yourself
+]
+
+{ #category : #accessing }
+NSClue >> axis [
+	^ axis
+]
+
+{ #category : #accessing }
+NSClue >> axis: anObject [
+	axis := anObject
 ]
 
 { #category : #initialization }

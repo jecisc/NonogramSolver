@@ -10,7 +10,5 @@ NSColumnsClues >> buildFrom: aXMLElement [
 	self flag: #improve.
 	lines := aXMLElement nodes anyOne nodes anyOne nodes.
 	cluesAxis := NSCluesAxis ofSize: lines size cluesList: self.
-	lines
-		doWithIndex:
-			[ :line :lineIndex | line nodes do: [ :node | node contentString = ' ' ifFalse: [ (cluesAxis at: lineIndex) add: (NSClue clue: node contentString asNumber) ] ] ]
+	lines doWithIndex: [ :line :index | line nodes do: [ :node | cluesAxis addClue: node contentString ifNeededAt: index ] ]
 ]
