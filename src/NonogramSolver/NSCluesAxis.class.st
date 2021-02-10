@@ -36,6 +36,25 @@ NSCluesAxis >> at: anInteger put: anObject [
 ]
 
 { #category : #accessing }
+NSCluesAxis >> axisSize [
+	^ self ifLineClues: [ self grid numberOfColumns ] ifColumnClues: [ self grid numberOfLines ]
+]
+
+{ #category : #checking }
+NSCluesAxis >> banIntervalOf: aNSClue [
+	"When we solve a clue, we know that its interval and the borns around it are forbidden to the other clues."
+
+	| indexOfSolvedClue |
+	indexOfSolvedClue := self indexOf: aNSClue.
+	clues
+		doWithIndex: [ :clue :index | 
+			"If we have a clue before the solved clue, we remove everything after the case before this clue."
+			index < indexOfSolvedClue ifTrue: [ clue banFromPossibleInterval: (aNSClue possibleInterval min - 1 to: self axisSize) ].
+			"If we have a clue after the solved clue, we remove everything before the case of after this clue"
+			index > indexOfSolvedClue ifTrue: [ clue banFromPossibleInterval: (1 to: aNSClue possibleInterval max + 1) ] ]
+]
+
+{ #category : #accessing }
 NSCluesAxis >> clues [
 	^ clues
 ]

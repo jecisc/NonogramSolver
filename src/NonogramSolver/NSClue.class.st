@@ -40,12 +40,34 @@ NSClue >> axisIndex [
 	^ axis index
 ]
 
+{ #category : #accessing }
+NSClue >> banFromPossibleInterval: anInterval [
+	"Remove the interval as parameter from the possible interval."
+
+	"If the possible interval does not includes the interval in parameter, we do nothing."
+	(possibleInterval includesAny: anInterval) ifFalse: [ ^ self ].
+
+	(anInterval min > possibleInterval min and: [ anInterval max < possibleInterval max ])
+		ifTrue: [ self error: 'The interval should not be included inside the possible interval. This would split the possible interval in two.' ].
+
+	(anInterval min < possibleInterval min and: [ anInterval max > possibleInterval max ])
+		ifTrue: [ self error: 'The interval should not include the possible interval, else this mean the clue has no solution.' ].
+
+	"Remove all elements found in the interval and recast the collection as an interval."
+	possibleInterval := possibleInterval asOrderedCollection.
+	possibleInterval removeAllFoundIn: anInterval.
+	possibleInterval := possibleInterval min to: possibleInterval max.
+
+	self checkIsSolved
+]
+
 { #category : #checking }
 NSClue >> checkIsSolved [
 	isSolved ifTrue: [ ^ true ].
 	
 	possibleInterval size = value ifFalse: [ ^ false ].
 	
+	"If the clue is not solved but the possible interval is of the size of the value, we can mark it as solved and ensure the grid is filled."
 	self solved.
 	possibleInterval do: [ :intervalIndex | 
 		self
@@ -118,7 +140,8 @@ NSClue >> restrainPossibleIntervalWith: anInterval [
 
 { #category : #accessing }
 NSClue >> solved [
-	isSolved := true
+	isSolved := true.
+	axis banIntervalOf: self
 ]
 
 { #category : #accessing }
