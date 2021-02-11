@@ -58,6 +58,14 @@ NSResolver >> at: anInteger at: anInteger2 put: aState [
 	grid at: anInteger at: anInteger2 put: aState 
 ]
 
+{ #category : #checking }
+NSResolver >> check [
+	"Between two resolvers, check the clues to see if we can resolve some things. For example, if all their possible intervals are filled, then it means it is solved."
+
+	verticalClues check.
+	horizontalClues check.
+]
+
 { #category : #accessing }
 NSResolver >> clueForColumn: columnIndex [
 	^ horizontalClues at: columnIndex
@@ -111,7 +119,11 @@ NSResolver >> on: aDOM [
 
 { #category : #'as yet unclassified' }
 NSResolver >> resolve [
-	NSAbstractSolver solvers do: [ :solver | solver resolve: self ] separatedBy: [ self isResolved ifTrue: [ ^ self ] ]
+	NSAbstractSolver solvers
+		do: [ :solver | 
+			solver resolve: self.
+			self check ]
+		separatedBy: [ self isResolved ifTrue: [ ^ self ] ]
 ]
 
 { #category : #'as yet unclassified' }

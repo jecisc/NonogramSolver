@@ -24,6 +24,11 @@ NSGrid >> at: lineIndex at: columnIndex put: aState [
 	content at: lineIndex at: columnIndex put: aState 
 ]
 
+{ #category : #accessing }
+NSGrid >> columnAt: anInteger [ 
+	^ (1 to: self numberOfLines) collect: [ :each | self at: each at: anInteger ]
+]
+
 { #category : #testing }
 NSGrid >> columnIsAllKnown: columnIndex [ 
 	1 to: self numberOfLines do: [ :lineIndex | (content at: lineIndex at: columnIndex) isKnown ifFalse: [ ^ false ] ].
@@ -46,6 +51,11 @@ NSGrid >> isResolved [
 		1 to: self numberOfLines do: [ :lineIndex | 
 			(content at: lineIndex at: columnIndex) isKnown ifFalse: [ ^ false ]  ] ].
 	^ true
+]
+
+{ #category : #accessing }
+NSGrid >> lineAt: anInteger [ 
+	^ (1 to: self numberOfColumns) collect: [ :each | self at: anInteger at: each ]
 ]
 
 { #category : #testing }

@@ -44,6 +44,8 @@ NSClue >> axisIndex [
 NSClue >> banFromPossibleInterval: anInterval [
 	"Remove the interval as parameter from the possible interval."
 
+	self isSolved ifTrue: [ ^ self ].
+
 	"If the possible interval does not includes the interval in parameter, we do nothing."
 	(possibleInterval includesAny: anInterval) ifFalse: [ ^ self ].
 
@@ -58,6 +60,11 @@ NSClue >> banFromPossibleInterval: anInterval [
 	possibleInterval removeAllFoundIn: anInterval.
 	possibleInterval := possibleInterval min to: possibleInterval max.
 
+	self checkIsSolved
+]
+
+{ #category : #checking }
+NSClue >> check [
 	self checkIsSolved
 ]
 
@@ -134,6 +141,8 @@ NSClue >> printOn: aStream [
 
 { #category : #accessing }
 NSClue >> restrainPossibleIntervalWith: anInterval [ 
+	self isSolved ifTrue: [ ^ self ].
+
 	possibleInterval := ((possibleInterval min) max: anInterval min) to: ((possibleInterval max) min: anInterval max).
 	self checkIsSolved
 ]

@@ -54,6 +54,26 @@ NSCluesAxis >> banIntervalOf: aNSClue [
 			index > indexOfSolvedClue ifTrue: [ clue banFromPossibleInterval: (1 to: aNSClue possibleInterval max + 1) ] ]
 ]
 
+{ #category : #checking }
+NSCluesAxis >> check [
+	self isResolved ifTrue: [ ^ self ].
+
+	self checkIfAxisIsFullyFilled.
+	clues do: #check
+]
+
+{ #category : #checking }
+NSCluesAxis >> checkIfAxisIsFullyFilled [
+	| filledIntervals |
+	filledIntervals := self gridAxis filledIntervals.
+	(filledIntervals size = self size) ifFalse: [ ^ self ].
+	
+	filledIntervals doWithIndex: [ :interval :index | (interval size = (self at: index) value) ifFalse: [ ^ self ] ].
+
+	"If all filled interval matches the clues, then the line is full and we can ensure the clues are updated."
+	filledIntervals doWithIndex: [ :interval :index | (self at: index) restrainPossibleIntervalWith: interval ]
+]
+
 { #category : #accessing }
 NSCluesAxis >> clues [
 	^ clues
@@ -89,6 +109,11 @@ NSCluesAxis >> grid [
 	^ cluesList grid
 ]
 
+{ #category : #accessing }
+NSCluesAxis >> gridAxis [
+	^ self ifLineClues: [ self grid lineAt: self index ] ifColumnClues: [ self grid columnAt: self index ]
+]
+
 { #category : #testing }
 NSCluesAxis >> ifEmpty: aBlockClosure [ 
 	^ clues ifEmpty: aBlockClosure 
@@ -118,6 +143,13 @@ NSCluesAxis >> initialize [
 { #category : #enumeration }
 NSCluesAxis >> inject: aCollection into: aBlockClosure [ 
 	^ clues inject: aCollection into: aBlockClosure 
+]
+
+{ #category : #checking }
+NSCluesAxis >> isResolved [
+	^ self
+		ifLineClues: [ self grid lineIsAllKnown: self index ]
+		ifColumnClues: [ self grid columnIsAllKnown: self index ]
 ]
 
 { #category : #printing }
