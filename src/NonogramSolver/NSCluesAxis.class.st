@@ -59,6 +59,7 @@ NSCluesAxis >> check [
 	self isResolved ifTrue: [ ^ self ].
 
 	self checkIfAxisIsFullyFilled.
+	self checkIfFilledIntervalCanFinishAClue.
 	clues do: #check
 ]
 
@@ -72,6 +73,15 @@ NSCluesAxis >> checkIfAxisIsFullyFilled [
 
 	"If all filled interval matches the clues, then the line is full and we can ensure the clues are updated."
 	filledIntervals doWithIndex: [ :interval :index | (self at: index) restrainPossibleIntervalWith: interval ]
+]
+
+{ #category : #checking }
+NSCluesAxis >> checkIfFilledIntervalCanFinishAClue [
+	"If a filled interval matches only one clue and is the same size as this clue, then we can resolve the clue."
+
+	| possibleCluesForFilledIntervals |
+	possibleCluesForFilledIntervals := (self gridAxis filledIntervals collect: [ :interval | interval -> (self possibleCluesForFilledInterval: interval) ]) asDictionary.
+	possibleCluesForFilledIntervals keysAndValuesDo: [ :interval :cls | (cls size = 1 and: [ cls anyOne value = interval size ]) ifTrue: [ cls anyOne restrainPossibleIntervalWith: interval ] ]
 ]
 
 { #category : #accessing }
@@ -150,6 +160,14 @@ NSCluesAxis >> isResolved [
 	^ self
 		ifLineClues: [ self grid lineIsAllKnown: self index ]
 		ifColumnClues: [ self grid columnIsAllKnown: self index ]
+]
+
+{ #category : #accessing }
+NSCluesAxis >> possibleCluesForFilledInterval: interval [
+	"I return all the clues that can contain an interval of filled cases.
+	The interval cannot be bigger than the clue size and et needs to be included in the possible interval of the clue."
+
+	^ clues select: [ :clue | clue value >= interval size and: [ clue possibleInterval includesAll: interval ] ]
 ]
 
 { #category : #printing }
