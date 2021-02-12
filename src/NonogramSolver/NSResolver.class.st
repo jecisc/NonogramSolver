@@ -163,10 +163,10 @@ NSResolver >> resolveWith: aCollectionOfResolver [
 
 	self
 		execute: [ aCollectionOfResolver
-				anySatisfy: [ :solver | 
+				do: [ :solver | 
 					solver resolve: self.
 					self check.
-					self isResolved ] ]
+					self isResolved ifTrue: [ ^ self ] ] ]
 		recordedAs: 'Pass ' , resolutionPass asString.
 	resolutionPass := resolutionPass + 1
 ]
