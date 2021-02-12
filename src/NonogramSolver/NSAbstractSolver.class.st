@@ -35,8 +35,18 @@ NSAbstractSolver class >> solvers [
 ]
 
 { #category : #'as yet unclassified' }
+NSAbstractSolver >> at: anInteger at: anInteger2 [
+	^ resolver at: anInteger at: anInteger2
+]
+
+{ #category : #'as yet unclassified' }
 NSAbstractSolver >> at: anInteger at: anInteger2 put: aState [ 
 	resolver at: anInteger at: anInteger2 put: aState 
+]
+
+{ #category : #accessing }
+NSAbstractSolver >> axisAt: axisIndex at: index for: clues [
+	^ clues ifLineClues: [ self at: axisIndex at: index ] ifColumnClues: [ self at: index at: axisIndex ]
 ]
 
 { #category : #resolve }

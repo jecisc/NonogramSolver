@@ -54,6 +54,11 @@ ZnServer default delegate: (ZnWebSocketDelegate handler:
 ]
 
 { #category : #'as yet unclassified' }
+NSResolver >> at: anInteger at: anInteger2 [
+	^ grid at: anInteger at: anInteger2
+]
+
+{ #category : #'as yet unclassified' }
 NSResolver >> at: anInteger at: anInteger2 put: aState [ 
 	grid at: anInteger at: anInteger2 put: aState 
 ]

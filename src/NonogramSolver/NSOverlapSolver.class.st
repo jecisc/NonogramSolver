@@ -15,19 +15,23 @@ NSOverlapSolver >> resolve [
 		withUnfinishedAxisDo: [ :axisIndex :clues :axisSize | 
 			| endToBeginInterval counter beginToEndInterval |
 			self flag: #todo.	"Use already filled items on the line. Use empty cases on the line."
-			self flag: #todo. "Firste improvement can be to use the filled cases at the beginning of the rows."
 			beginToEndInterval := Array new: clues size.
 			endToBeginInterval := Array new: clues size.
 
 			counter := 1.
 			clues
 				doWithIndex: [ :clue :index | 
+					"skip the empty cases"
+					[ (self axisAt: axisIndex at: counter for: clues) isEmpty ] whileTrue: [ counter := counter + 1 ].
+
 					beginToEndInterval at: index put: (counter to: counter + clue value - 1).
 					counter := counter + clue value + 1 ].
 
 			counter := axisSize.
 			clues reverse
 				doWithIndex: [ :clue :index | 
+					"skip the empty cases"
+					[ (self axisAt: axisIndex at: counter for: clues) isEmpty ] whileTrue: [ counter := counter - 1 ].
 					endToBeginInterval at: clues size - index + 1 put: (counter - clue value + 1 to: counter).
 					counter := counter - clue value - 1 ].
 
