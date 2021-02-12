@@ -22,6 +22,8 @@ NSGrid >> at: lineIndex at: columnIndex [
 
 { #category : #'as yet unclassified' }
 NSGrid >> at: lineIndex at: columnIndex put: aState [ 
+	(self at: lineIndex at: columnIndex) = aState ifTrue: [ ^ self ]. "To avoid to update the #wasRecentlyUpdated flag."
+
 	content at: lineIndex at: columnIndex put: aState.
 	wasRecentlyUpdated := true
 ]
