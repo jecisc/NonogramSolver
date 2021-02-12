@@ -1,6 +1,9 @@
 Class {
 	#name : #NSOverlapSolver,
 	#superclass : #NSAbstractSolver,
+	#instVars : [
+		'counter'
+	],
 	#category : #NonogramSolver
 }
 
@@ -10,54 +13,40 @@ NSOverlapSolver class >> priority [
 ]
 
 { #category : #resolving }
-NSOverlapSolver >> reduceInterval: possibleInterval forClue: clue axisIndex: axisIndex clues: clues [
-	"We check if we have an empty case at the beginning or end of the possible interval that would make the clue impossible to fit."
-
-	| initialInterval reducedInterval |
-	initialInterval := possibleInterval.
-	[ reducedInterval := self
-		reduceOnceInterval: initialInterval
-		forClue: clue
-		axisIndex: axisIndex
-		clues: clues.
-	initialInterval = reducedInterval ] whileFalse: [ initialInterval := reducedInterval ].	"As long as we can reduce, we try to reduce once again."
-	^ reducedInterval
-]
-
-{ #category : #resolving }
-NSOverlapSolver >> reduceOnceInterval: initialInterval forClue: clue axisIndex: axisIndex clues: clues [
-	| reducedInterval |
-	reducedInterval := initialInterval.
-
-	((reducedInterval min to: (reducedInterval min + clue value min: reducedInterval max)) select: [ :i | (self axisAt: axisIndex at: i for: clues) isEmpty ])
-		ifNotEmpty: [ :emptyCases | reducedInterval := emptyCases max to: reducedInterval max ].
-
-	(((reducedInterval max - clue value max: reducedInterval min) to: reducedInterval max) select: [ :i | (self axisAt: axisIndex at: i for: clues) isEmpty ])
-		ifNotEmpty: [ :emptyCases | reducedInterval := reducedInterval min to: emptyCases min ].
-
-	^ reducedInterval
-]
-
-{ #category : #resolving }
 NSOverlapSolver >> resolve [
 	self
 		withUnfinishedAxisDo: [ :axisIndex :clues :axisSize | 
-			| endToBeginInterval counter beginToEndInterval |
+			| endToBeginInterval beginToEndInterval |
 			self flag: #todo.	"Use already filled items on the line. Use empty cases on the line."
 			beginToEndInterval := Array new: clues size.
 			endToBeginInterval := Array new: clues size.
 
-			self flag: #todo.	"We might be able to remove the duplication?"
 			counter := 1.
 			clues
 				doWithIndex: [ :clue :index | 
-					beginToEndInterval at: index put: (self reduceInterval: (counter to: counter + clue value - 1) forClue: clue axisIndex: axisIndex clues: clues).
+					beginToEndInterval
+						at: index
+						put:
+							(self
+								tryToShiftInterval: (counter to: counter + clue value - 1)
+								clueValue: clue value
+								axisIndex: axisIndex
+								forClues: clues
+								shiftFurther: true).
 					counter := counter + clue value + 1 ].
 
 			counter := axisSize.
 			clues reverse
-				doWithIndex: [ :clue :index |
-					endToBeginInterval at: clues size - index + 1 put: (self reduceInterval: (counter - clue value + 1 to: counter) forClue: clue axisIndex: axisIndex clues: clues).
+				doWithIndex: [ :clue :index | 
+					endToBeginInterval
+						at: clues size - index + 1
+						put:
+							(self
+								tryToShiftInterval: (counter - clue value + 1 to: counter)
+								clueValue: clue value
+								axisIndex: axisIndex
+								forClues: clues
+								shiftFurther: false).
 					counter := counter - clue value - 1 ].
 
 			counter := 1.
@@ -73,4 +62,37 @@ NSOverlapSolver >> resolve [
 								put: NSFilledState
 								for: clues ].
 					counter := counter + 1 ] ]
+]
+
+{ #category : #resolving }
+NSOverlapSolver >> tryToShiftInterval: possibleInterval clueValue: clueValue axisIndex: axisIndex forClues: clues shiftFurther: aBoolean [
+	| initialInterval shiftedInterval |
+	initialInterval := possibleInterval.
+	[ shiftedInterval := self
+		tryToShiftOnceInterval: initialInterval
+		clueValue: clueValue
+		axisIndex: axisIndex
+		forClues: clues
+		shiftFurther: aBoolean.
+	initialInterval = shiftedInterval ] whileFalse: [ initialInterval := shiftedInterval ].	"As long as we can shift, we try to shift once again."
+	^ shiftedInterval
+]
+
+{ #category : #resolving }
+NSOverlapSolver >> tryToShiftOnceInterval: possibleInterval clueValue: clueValue axisIndex: axisIndex forClues: clues shiftFurther: aBoolean [
+	| interval |
+	interval := possibleInterval.
+	(interval select: [ :i | (self axisAt: axisIndex at: i for: clues) isEmpty ])
+		ifNotEmpty: [ :emptyCases | 
+			| shift |
+			shift := aBoolean
+				ifTrue: [ emptyCases max - interval min + 1 ]
+				ifFalse: [ emptyCases min - interval max + 1 ].
+			counter := aBoolean
+				ifTrue: [ counter + shift ]
+				ifFalse: [ counter := counter - shift ].
+			interval := aBoolean
+				ifTrue: [ interval + shift ]
+				ifFalse: [ interval - shift ] ].
+	^ interval
 ]

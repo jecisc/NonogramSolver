@@ -60,6 +60,7 @@ NSCluesAxis >> check [
 
 	self checkIfAxisIsFullyFilled.
 	self checkIfFilledIntervalCanFinishAClue.
+	self flag: #todo. "Check the unkwnon interval if they are smaller than the possible clues associated."
 	clues do: #check
 ]
 
