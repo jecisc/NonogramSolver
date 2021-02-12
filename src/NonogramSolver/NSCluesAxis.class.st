@@ -115,6 +115,11 @@ NSCluesAxis >> doWithIndex: aBlockClosure [
 ]
 
 { #category : #accessing }
+NSCluesAxis >> first [
+	^ clues first
+]
+
+{ #category : #accessing }
 NSCluesAxis >> grid [
 	^ cluesList grid
 ]
@@ -160,6 +165,11 @@ NSCluesAxis >> isResolved [
 	^ self
 		ifLineClues: [ self grid lineIsAllKnown: self index ]
 		ifColumnClues: [ self grid columnIsAllKnown: self index ]
+]
+
+{ #category : #accessing }
+NSCluesAxis >> last [
+	^ clues last
 ]
 
 { #category : #accessing }
