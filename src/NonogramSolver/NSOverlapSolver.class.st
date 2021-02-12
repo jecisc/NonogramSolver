@@ -87,10 +87,10 @@ NSOverlapSolver >> tryToShiftOnceInterval: possibleInterval clueValue: clueValue
 			| shift |
 			shift := aBoolean
 				ifTrue: [ emptyCases max - interval min + 1 ]
-				ifFalse: [ emptyCases min - interval max + 1 ].
+				ifFalse: [ interval max - emptyCases min + 1 ].
 			counter := aBoolean
 				ifTrue: [ counter + shift ]
-				ifFalse: [ counter := counter - shift ].
+				ifFalse: [ counter - shift ].
 			interval := aBoolean
 				ifTrue: [ interval + shift ]
 				ifFalse: [ interval - shift ] ].
