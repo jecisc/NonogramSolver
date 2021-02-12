@@ -15,6 +15,7 @@ NSOverlapSolver >> resolve [
 		withUnfinishedAxisDo: [ :axisIndex :clues :axisSize | 
 			| endToBeginInterval counter beginToEndInterval |
 			self flag: #todo.	"Use already filled items on the line. Use empty cases on the line."
+			self flag: #todo. "Firste improvement can be to use the filled cases at the beginning of the rows."
 			beginToEndInterval := Array new: clues size.
 			endToBeginInterval := Array new: clues size.
 
