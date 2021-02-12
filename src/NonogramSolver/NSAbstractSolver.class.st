@@ -24,9 +24,11 @@ NSAbstractSolver class >> reapplyableSolvers [
 
 { #category : #resolving }
 NSAbstractSolver class >> resolve: aResolver [
-	^ self new
-		resolver: aResolver;
-		resolve
+	self
+		execute: [ self new
+				resolver: aResolver;
+				resolve ]
+		recordedAs: 'Execute ' , self name
 ]
 
 { #category : #accessing }

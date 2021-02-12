@@ -15,17 +15,27 @@ BaselineOfNonogramSolver >> baseline: spec [
 		do: [
 			"Dependencies"
 			self
+				tinyLogger: spec;
 				webSocket: spec;
 				xmlParserHTML: spec;
 				xpath: spec.
 
 			"Packages"
-			spec package: 'NonogramSolver' with: [ spec requires: #('ZincHTTPComponents' 'XPath' 'XMLParserHTML') ] ].
+			spec package: 'NonogramSolver' with: [ spec requires: #('TinyLogger' 'ZincHTTPComponents' 'XPath' 'XMLParserHTML') ] ].
 ]
 
 { #category : #accessing }
 BaselineOfNonogramSolver >> projectClass [
 	^ MetacelloCypressBaselineProject
+]
+
+{ #category : #dependencies }
+BaselineOfNonogramSolver >> tinyLogger: spec [
+	spec
+		baseline: 'TinyLogger'
+		with: [ spec
+				loads: #('Core');
+				repository: 'github://jecisc/TinyLogger:v1.x.x/src' ]
 ]
 
 { #category : #dependencies }

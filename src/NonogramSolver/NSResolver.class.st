@@ -9,6 +9,25 @@ Class {
 	#category : #NonogramSolver
 }
 
+{ #category : #'class initialization' }
+NSResolver class >> initialize [
+	self initializeLogger
+]
+
+{ #category : #'class initialization' }
+NSResolver class >> initializeLogger [
+	TinyLogger default
+		ensureTranscriptLogger;
+		timestampFormatBlock:
+			[ :aStream :timestamp | 
+			timestamp asDate printOn: aStream.
+			aStream << ' '.
+			timestamp asTime
+				print24: true
+				on: aStream
+			]
+]
+
 { #category : #'instance creation' }
 NSResolver class >> on: aDOM [ 
 	^ self new
@@ -124,9 +143,18 @@ NSResolver >> on: aDOM [
 
 { #category : #'as yet unclassified' }
 NSResolver >> resolve [
-	((self resolveWith: NSAbstractSolver solvers) or: [ self wasGridRecentlyUpdated not ]) ifTrue: [ ^ self ].
+	self
+		execute: [ | counter |
+			counter := 1.
+			self
+				execute: [ ((self resolveWith: NSAbstractSolver solvers) or: [ self wasGridRecentlyUpdated not ]) ifTrue: [ ^ self ] ]
+				recordedAs: 'Pass ' , counter asString.
 
-	[ (self resolveWith: NSAbstractSolver reapplyableSolvers) and: [ self wasGridRecentlyUpdated ] ] whileTrue
+			[ | isFinished |
+			counter := counter + 1.
+			self execute: [ isFinished := self resolveWith: NSAbstractSolver reapplyableSolvers ] recordedAs: 'Pass ' , counter asString.
+			isFinished and: [ self wasGridRecentlyUpdated ] ] whileTrue ]
+		recordedAs: 'Resolve'
 ]
 
 { #category : #'as yet unclassified' }
