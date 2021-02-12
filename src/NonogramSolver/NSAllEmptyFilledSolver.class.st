@@ -4,6 +4,11 @@ Class {
 	#category : #NonogramSolver
 }
 
+{ #category : #testing }
+NSAllEmptyFilledSolver class >> canBeReapplied [
+	^ false
+]
+
 { #category : #accessing }
 NSAllEmptyFilledSolver class >> priority [
 	^ 5

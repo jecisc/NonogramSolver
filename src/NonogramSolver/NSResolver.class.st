@@ -119,11 +119,20 @@ NSResolver >> on: aDOM [
 
 { #category : #'as yet unclassified' }
 NSResolver >> resolve [
-	NSAbstractSolver solvers
-		do: [ :solver | 
+	((self resolveWith: NSAbstractSolver solvers) or: [ self wasGridRecentlyUpdated not ]) ifTrue: [ ^ self ].
+
+	[ (self resolveWith: NSAbstractSolver reapplyableSolvers) and: [ self wasGridRecentlyUpdated ] ] whileTrue
+]
+
+{ #category : #'as yet unclassified' }
+NSResolver >> resolveWith: aCollectionOfResolver [
+	"We run all solvers but if one ends the resolution, we stop there."
+
+	^ aCollectionOfResolver
+		anySatisfy: [ :solver | 
 			solver resolve: self.
-			self check ]
-		separatedBy: [ self isResolved ifTrue: [ ^ self ] ]
+			self check.
+			self isResolved ]
 ]
 
 { #category : #'as yet unclassified' }
@@ -139,4 +148,12 @@ NSResolver >> solution [
 	result at: 'filled' put: filled asArray.
 	result at: 'empty' put: empty asArray.
 	^ STONJSON toString: result
+]
+
+{ #category : #'as yet unclassified' }
+NSResolver >> wasGridRecentlyUpdated [
+	| wasRecentlyUpdated |
+	wasRecentlyUpdated := grid wasRecentlyUpdated.
+	grid resetUpdateChecker.
+	^ wasRecentlyUpdated
 ]

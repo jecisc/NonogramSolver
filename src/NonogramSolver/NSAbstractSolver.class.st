@@ -7,9 +7,19 @@ Class {
 	#category : #NonogramSolver
 }
 
+{ #category : #testing }
+NSAbstractSolver class >> canBeReapplied [
+	^ true
+]
+
 { #category : #accessing }
 NSAbstractSolver class >> priority [
 	^ self subclassResponsibility
+]
+
+{ #category : #accessing }
+NSAbstractSolver class >> reapplyableSolvers [
+	^ (self allSubclasses select: #canBeReapplied) sorted: #priority ascending
 ]
 
 { #category : #resolving }

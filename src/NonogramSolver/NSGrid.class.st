@@ -2,7 +2,8 @@ Class {
 	#name : #NSGrid,
 	#superclass : #Object,
 	#instVars : [
-		'content'
+		'content',
+		'wasRecentlyUpdated'
 	],
 	#category : #NonogramSolver
 }
@@ -21,7 +22,8 @@ NSGrid >> at: lineIndex at: columnIndex [
 
 { #category : #'as yet unclassified' }
 NSGrid >> at: lineIndex at: columnIndex put: aState [ 
-	content at: lineIndex at: columnIndex put: aState 
+	content at: lineIndex at: columnIndex put: aState.
+	wasRecentlyUpdated := true
 ]
 
 { #category : #accessing }
@@ -43,6 +45,12 @@ NSGrid >> content [
 { #category : #accessing }
 NSGrid >> height [
 	^ content numberOfRows
+]
+
+{ #category : #initialization }
+NSGrid >> initialize [
+	super initialize.
+	self resetUpdateChecker
 ]
 
 { #category : #testing }
@@ -72,6 +80,16 @@ NSGrid >> numberOfColumns [
 { #category : #accessing }
 NSGrid >> numberOfLines [
 	^ content numberOfRows
+]
+
+{ #category : #initialization }
+NSGrid >> resetUpdateChecker [
+	wasRecentlyUpdated := false
+]
+
+{ #category : #accessing }
+NSGrid >> wasRecentlyUpdated [
+	^ wasRecentlyUpdated
 ]
 
 { #category : #accessing }
