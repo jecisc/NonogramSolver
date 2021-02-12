@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'horizontalClues',
 		'verticalClues',
-		'grid'
+		'grid',
+		'resolutionPass'
 	],
 	#category : #NonogramSolver
 }
@@ -110,6 +111,12 @@ NSResolver >> grid [
 	^ grid
 ]
 
+{ #category : #initialization }
+NSResolver >> initialize [
+	super initialize.
+	resolutionPass := 1
+]
+
 { #category : #testing }
 NSResolver >> isResolved [
 	^ grid isResolved
@@ -144,16 +151,9 @@ NSResolver >> on: aDOM [
 { #category : #'as yet unclassified' }
 NSResolver >> resolve [
 	self
-		execute: [ | counter |
-			counter := 1.
-			self
-				execute: [ ((self resolveWith: NSAbstractSolver solvers) or: [ self wasGridRecentlyUpdated not ]) ifTrue: [ ^ self ] ]
-				recordedAs: 'Pass ' , counter asString.
+		execute: [ self resolveWith: NSAbstractSolver solvers.
 
-			[ | isFinished |
-			counter := counter + 1.
-			self execute: [ isFinished := self resolveWith: NSAbstractSolver reapplyableSolvers ] recordedAs: 'Pass ' , counter asString.
-			isFinished and: [ self wasGridRecentlyUpdated ] ] whileTrue ]
+			[ self isResolved not and: [ self wasGridRecentlyUpdated ] ] whileTrue: [ self resolveWith: NSAbstractSolver reapplyableSolvers ] ]
 		recordedAs: 'Resolve'
 ]
 
@@ -161,11 +161,14 @@ NSResolver >> resolve [
 NSResolver >> resolveWith: aCollectionOfResolver [
 	"We run all solvers but if one ends the resolution, we stop there."
 
-	^ aCollectionOfResolver
-		anySatisfy: [ :solver | 
-			solver resolve: self.
-			self check.
-			self isResolved ]
+	self
+		execute: [ aCollectionOfResolver
+				anySatisfy: [ :solver | 
+					solver resolve: self.
+					self check.
+					self isResolved ] ]
+		recordedAs: 'Pass ' , resolutionPass asString.
+	resolutionPass := resolutionPass + 1
 ]
 
 { #category : #'as yet unclassified' }
