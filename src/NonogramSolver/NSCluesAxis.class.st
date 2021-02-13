@@ -66,7 +66,7 @@ NSCluesAxis >> check [
 
 { #category : #checking }
 NSCluesAxis >> checkIfAllCluesAreSolvedThatTheAxeIsResolved [
-	((clues reject: #isSolved) isEmpty and: [ self isResolved not ])
+	(self unresolvedClues isEmpty and: [ self isResolved not ])
 		ifTrue: [ self gridAxis
 				doWithIndex: [ :state :index | 
 					state isKnown
@@ -207,4 +207,9 @@ NSCluesAxis >> reverse [
 { #category : #accessing }
 NSCluesAxis >> size [
 	^ clues size
+]
+
+{ #category : #accessing }
+NSCluesAxis >> unresolvedClues [
+	^ clues reject: #isSolved
 ]
