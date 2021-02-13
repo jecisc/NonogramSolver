@@ -60,6 +60,7 @@ NSCluesAxis >> check [
 
 	self checkIfAxisIsFullyFilled.
 	self checkIfFilledIntervalCanFinishAClue.
+	self checkPossibleIntervalsCanBeShortenWithEmptyCases.
 	clues do: #check.
 	self checkIfAllCluesAreSolvedThatTheAxeIsResolved
 ]
@@ -92,6 +93,25 @@ NSCluesAxis >> checkIfFilledIntervalCanFinishAClue [
 	| possibleCluesForFilledIntervals |
 	possibleCluesForFilledIntervals := (self gridAxis filledIntervals collect: [ :interval | interval -> (self possibleCluesForFilledInterval: interval) ]) asDictionary.
 	possibleCluesForFilledIntervals keysAndValuesDo: [ :interval :cls | (cls size = 1 and: [ cls anyOne value = interval size ]) ifTrue: [ cls anyOne restrainPossibleIntervalWith: interval ] ]
+]
+
+{ #category : #checking }
+NSCluesAxis >> checkPossibleIntervalsCanBeShortenWithEmptyCases [
+	"If the possible interval of a clue contains an empty case that does not allow to fit the clue before or after it, we can restrain the possible interval of the clue to exclude the beginning or the end."
+
+	self gridAxis emptyIntervals flattened
+		ifNotEmpty: [ :emptyIndexes | 
+			self unresolvedClues
+				do: [ :clue | 
+					emptyIndexes
+						select: [ :index | clue possibleInterval includes: index ]
+						thenDo: [ :index | 
+							| intervalToConsider |
+							intervalToConsider := clue possibleInterval min to: index.
+							intervalToConsider size <= clue value ifTrue: [ clue banFromPossibleInterval: intervalToConsider ].
+
+							intervalToConsider := index to: clue possibleInterval max.
+							intervalToConsider size <= clue value ifTrue: [ clue banFromPossibleInterval: intervalToConsider ] ] ] ]
 ]
 
 { #category : #accessing }

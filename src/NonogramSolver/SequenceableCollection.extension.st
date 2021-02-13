@@ -1,12 +1,22 @@
 Extension { #name : #SequenceableCollection }
 
 { #category : #'*NonogramSolver' }
+SequenceableCollection >> emptyIntervals [
+	^ self intervalsMatching: #isEmpty
+]
+
+{ #category : #'*NonogramSolver' }
 SequenceableCollection >> filledIntervals [
+	^ self intervalsMatching: #isFilled
+]
+
+{ #category : #'*NonogramSolver' }
+SequenceableCollection >> intervalsMatching: aBlock [
 	| result currentInterval |
 	result := OrderedCollection new.
 	self
 		doWithIndex: [ :each :index | 
-			each isFilled
+			(aBlock value: each)
 				ifTrue: [ currentInterval := (currentInterval
 						ifNil: [ index to: index ]
 						ifNotNil: [ currentInterval min to: index ]) ]
