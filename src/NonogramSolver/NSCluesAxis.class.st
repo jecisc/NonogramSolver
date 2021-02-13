@@ -60,7 +60,17 @@ NSCluesAxis >> check [
 
 	self checkIfAxisIsFullyFilled.
 	self checkIfFilledIntervalCanFinishAClue.
-	clues do: #check
+	clues do: #check.
+	self checkIfAllCluesAreSolvedThatTheAxeIsResolved
+]
+
+{ #category : #checking }
+NSCluesAxis >> checkIfAllCluesAreSolvedThatTheAxeIsResolved [
+	((clues reject: #isSolved) isEmpty and: [ self isResolved not ])
+		ifTrue: [ self gridAxis
+				doWithIndex: [ :state :index | 
+					state isKnown
+						ifFalse: [ self ifLineClues: [ self grid at: self index at: index put: NSEmptyState ] ifColumnClues: [ self grid at: index at: self index put: NSEmptyState ] ] ] ]
 ]
 
 { #category : #checking }
