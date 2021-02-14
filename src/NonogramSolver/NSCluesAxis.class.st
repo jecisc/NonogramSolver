@@ -73,7 +73,7 @@ NSCluesAxis >> check [
 NSCluesAxis >> checkAllFilledIntervalsOfTheSizeOfTheirMatchingCluesAreSurroundedByEmptyCases [
 	self gridAxis filledIntervals
 		do: [ :filledInterval | 
-			(self unresolvedClues select: [ :clue | clue possibleInterval includesAll: filledInterval ])
+			(self unresolvedClues select: [ :clue | clue canIncludeAll: filledInterval ])
 				ifNotEmpty: [ :matchingClues | 
 					(filledInterval size = matchingClues anyOne value and: [ matchingClues size > 1 and: [ (matchingClues collect: #value) asSet size = 1 ] ])
 						ifTrue: [ filledInterval min = 1 ifFalse: [ self inGridAt: filledInterval min - 1 put: NSEmptyState ].
@@ -102,7 +102,7 @@ NSCluesAxis >> checkIfAxisIsFullyFilled [
 NSCluesAxis >> checkIfFilledIntervalAreEntirelyInClues [
 	self gridAxis filledIntervals
 		do: [ :filledInterval | 
-			(self unresolvedClues select: [ :clue | (clue possibleInterval includesAny: filledInterval) and: [ (clue possibleInterval includesAll: filledInterval) not ] ])
+			(self unresolvedClues select: [ :clue | (clue canIncludeAny: filledInterval) and: [ (clue canIncludeAll: filledInterval) not ] ])
 				ifNotEmpty: [ :matchingClues | matchingClues do: [ :clue | clue banFromPossibleInterval: filledInterval ] ] ]
 ]
 
@@ -119,7 +119,7 @@ NSCluesAxis >> checkIfFilledIntervalCanFinishAClue [
 NSCluesAxis >> checkIfFilledIntervalsAreBiggerThanClueValue [
 	self gridAxis filledIntervals
 		do: [ :filledInterval | 
-			(self unresolvedClues select: [ :clue | clue possibleInterval includesAny: filledInterval ])
+			(self unresolvedClues select: [ :clue | clue canIncludeAny: filledInterval ])
 				ifNotEmpty: [ :matchingClues | 
 					matchingClues
 						do: [ :clue | 
@@ -268,7 +268,7 @@ NSCluesAxis >> possibleCluesForFilledInterval: interval [
 	"I return all the clues that can contain an interval of filled cases.
 	The interval cannot be bigger than the clue size and et needs to be included in the possible interval of the clue."
 
-	^ clues select: [ :clue | clue value >= interval size and: [ clue possibleInterval includesAll: interval ] ]
+	^ clues select: [ :clue | clue value >= interval size and: [ clue canIncludeAll: interval ] ]
 ]
 
 { #category : #printing }

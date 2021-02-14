@@ -42,7 +42,7 @@ NSClue >> banFromPossibleInterval: anInterval [
 	self isSolved ifTrue: [ ^ self ].
 
 	"If the possible interval does not includes the interval in parameter, we do nothing."
-	(possibleInterval includesAny: anInterval) ifFalse: [ ^ self ].
+	(self canIncludeAny: anInterval) ifFalse: [ ^ self ].
 
 	(anInterval min > possibleInterval min and: [ anInterval max < possibleInterval max ])
 		ifTrue: [ self flag: #todo. "The interval should not be included inside the possible interval. This would split the possible interval in two. Maybe later I could manage possible intervalS but not now." ^ self ].
@@ -61,6 +61,16 @@ NSClue >> banFromPossibleInterval: anInterval [
 { #category : #testing }
 NSClue >> canInclude: anIndex [
 	^ possibleInterval includes: anIndex
+]
+
+{ #category : #testing }
+NSClue >> canIncludeAll: aCollection [
+	^ possibleInterval includesAll: aCollection
+]
+
+{ #category : #testing }
+NSClue >> canIncludeAny: aCollection [
+	^ possibleInterval includesAny: aCollection
 ]
 
 { #category : #checking }
