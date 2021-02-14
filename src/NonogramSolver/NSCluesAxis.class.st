@@ -127,9 +127,9 @@ NSCluesAxis >> checkIfFilledIntervalsAreBiggerThanClueValue [
 								ifTrue: [ | intervalToBan |
 									"We can also remove what is before and after if they are at the limit."
 									intervalToBan := filledInterval.
-									(clue possibleInterval includes: filledInterval min - clue value - 1)
+									(clue canInclude: filledInterval min - clue value - 1)
 										ifFalse: [ intervalToBan := (0 max: filledInterval min - clue value - 1) to: intervalToBan max ].
-									(clue possibleInterval includes: filledInterval max + clue value + 1)
+									(clue canInclude: filledInterval max + clue value + 1)
 										ifFalse: [ intervalToBan := intervalToBan min to: (self axisSize min: filledInterval max + clue value + 1) ].
 									clue banFromPossibleInterval: intervalToBan ] ] ] ]
 ]
@@ -143,7 +143,7 @@ NSCluesAxis >> checkPossibleIntervalsCanBeShortenWithEmptyCases [
 			self unresolvedClues
 				do: [ :clue | 
 					emptyIndexes
-						select: [ :index | clue possibleInterval includes: index ]
+						select: [ :index | clue canInclude: index ]
 						thenDo: [ :index | 
 							| intervalToConsider |
 							intervalToConsider := clue possibleInterval min to: index.
@@ -157,7 +157,7 @@ NSCluesAxis >> checkPossibleIntervalsCanBeShortenWithEmptyCases [
 NSCluesAxis >> checkPossibleIntervalsCanBeShortenWithFilledCasesBelongingToOnlyOneClue [
 	self gridAxis filledIntervals flattened
 		do: [ :filledIndex | 
-			(self unresolvedClues select: [ :clue | clue possibleInterval includes: filledIndex ])
+			(self unresolvedClues select: [ :clue | clue canInclude: filledIndex ])
 				ifNotEmpty: [ :cluesMatchingFilledIndex | 
 					clues size = 1
 						ifTrue: [ | clue |

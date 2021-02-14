@@ -28,7 +28,7 @@ NSPushBorderSolver >> resolve [
 							| indexOfCloseEmptyCase |
 							indexOfCloseEmptyCase := emptyCases max.
 							clue possibleInterval
-								detect: [ :index | (clues select: [ :c | c possibleInterval includes: index ]) size = 1 and: [ (clues inGridAt: index) isFilled ] ]
+								detect: [ :index | (clues select: [ :c | c canInclude: index ]) size = 1 and: [ (clues inGridAt: index) isFilled ] ]
 								ifFound:
 									[ :indexOfFirstFilledCaseSpecificToClue | indexOfFirstFilledCaseSpecificToClue + 1 to: indexOfCloseEmptyCase + clue value do: [ :index | clues inGridAt: index put: NSFilledState ] ] ].
 
@@ -38,7 +38,7 @@ NSPushBorderSolver >> resolve [
 							| indexOfCloseEmptyCase |
 							indexOfCloseEmptyCase := emptyCases min.
 							clue possibleInterval reversed
-								detect: [ :index | (clues select: [ :c | c possibleInterval includes: index ]) size = 1 and: [ (clues inGridAt: index) isFilled ] ]
+								detect: [ :index | (clues select: [ :c | c canInclude: index ]) size = 1 and: [ (clues inGridAt: index) isFilled ] ]
 								ifFound:
 									[ :indexOfFirstFilledCaseSpecificToClue | indexOfCloseEmptyCase - clue value to: indexOfFirstFilledCaseSpecificToClue - 1 do: [ :index | clues inGridAt: index put: NSFilledState ] ] ] ] ]
 ]

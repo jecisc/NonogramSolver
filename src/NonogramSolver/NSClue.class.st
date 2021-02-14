@@ -58,6 +58,11 @@ NSClue >> banFromPossibleInterval: anInterval [
 	self checkIsSolved
 ]
 
+{ #category : #testing }
+NSClue >> canInclude: anIndex [
+	^ possibleInterval includes: anIndex
+]
+
 { #category : #checking }
 NSClue >> check [
 	self checkIsSolved
