@@ -120,7 +120,18 @@ NSCluesAxis >> checkIfFilledIntervalsAreBiggerThanClueValue [
 	self gridAxis filledIntervals
 		do: [ :filledInterval | 
 			(self unresolvedClues select: [ :clue | clue possibleInterval includesAny: filledInterval ])
-				ifNotEmpty: [ :matchingClues | matchingClues do: [ :clue | clue value < filledInterval size ifTrue: [ clue banFromPossibleInterval: filledInterval ] ] ] ]
+				ifNotEmpty: [ :matchingClues | 
+					matchingClues
+						do: [ :clue | 
+							clue value < filledInterval size
+								ifTrue: [ | intervalToBan |
+									"We can also remove what is before and after if they are at the limit."
+									intervalToBan := filledInterval.
+									(clue possibleInterval includes: filledInterval min - clue value - 1)
+										ifFalse: [ intervalToBan := (0 max: filledInterval min - clue value - 1) to: intervalToBan max ].
+									(clue possibleInterval includes: filledInterval max + clue value + 1)
+										ifFalse: [ intervalToBan := intervalToBan min to: (self axisSize min: filledInterval max + clue value + 1) ].
+									clue banFromPossibleInterval: intervalToBan ] ] ] ]
 ]
 
 { #category : #checking }

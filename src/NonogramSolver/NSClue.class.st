@@ -45,7 +45,7 @@ NSClue >> banFromPossibleInterval: anInterval [
 	(possibleInterval includesAny: anInterval) ifFalse: [ ^ self ].
 
 	(anInterval min > possibleInterval min and: [ anInterval max < possibleInterval max ])
-		ifTrue: [ self error: 'The interval should not be included inside the possible interval. This would split the possible interval in two.' ].
+		ifTrue: [ self flag: #todo. "The interval should not be included inside the possible interval. This would split the possible interval in two. Maybe later I could manage possible intervalS but not now." ^ self ].
 
 	(anInterval min < possibleInterval min and: [ anInterval max > possibleInterval max ])
 		ifTrue: [ self error: 'The interval should not include the possible interval, else this mean the clue has no solution.' ].
@@ -53,7 +53,7 @@ NSClue >> banFromPossibleInterval: anInterval [
 	"Remove all elements found in the interval and recast the collection as an interval."
 	possibleInterval := possibleInterval asOrderedCollection.
 	possibleInterval removeAllFoundIn: anInterval.
-	possibleInterval := possibleInterval min to: possibleInterval max.
+	self possibleInterval: (possibleInterval min to: possibleInterval max).
 
 	self checkIsSolved
 ]
@@ -114,6 +114,7 @@ NSClue >> possibleInterval [
 
 { #category : #accessing }
 NSClue >> possibleInterval: anObject [
+	self assert: anObject min <= anObject max.
 	possibleInterval := anObject
 ]
 
@@ -135,7 +136,7 @@ NSClue >> printOn: aStream [
 NSClue >> restrainPossibleIntervalWith: anInterval [ 
 	self isSolved ifTrue: [ ^ self ].
 
-	possibleInterval := ((possibleInterval min) max: anInterval min) to: ((possibleInterval max) min: anInterval max).
+	self possibleInterval: (((possibleInterval min) max: anInterval min) to: ((possibleInterval max) min: anInterval max)).
 	self checkIsSolved
 ]
 
