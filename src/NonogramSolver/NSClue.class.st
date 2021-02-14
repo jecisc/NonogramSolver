@@ -115,6 +115,7 @@ NSClue >> possibleInterval [
 { #category : #accessing }
 NSClue >> possibleInterval: anObject [
 	self assert: anObject min <= anObject max.
+	self assert: anObject size >= value.
 	possibleInterval := anObject
 ]
 

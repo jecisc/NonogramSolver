@@ -17,13 +17,13 @@ NSOverlapSolver >> resolve [
 	self
 		withUnfinishedAxisDo: [ :clues :axisSize | 
 			| endToBeginInterval beginToEndInterval |
-			self flag: #todo.	"Use already filled items on the line. Use empty cases on the line."
 			beginToEndInterval := Array new: clues size.
 			endToBeginInterval := Array new: clues size.
 
 			counter := 1.
 			clues
 				doWithIndex: [ :clue :index | 
+					(clue possibleInterval includes: counter) ifFalse: [ counter := clue possibleInterval min ].
 					beginToEndInterval
 						at: index
 						put:
@@ -32,11 +32,16 @@ NSOverlapSolver >> resolve [
 								clueValue: clue value
 								forClues: clues
 								shiftFurther: true).
-					counter := counter + clue value + 1 ].
+					counter := counter + clue value + 1.
+					"If the interval is followed by filled cases, then we can move it to embded it."
+					[ counter - 1 <= axisSize and: [ (clues inGridAt: counter - 1) isFilled ] ]
+						whileTrue: [ beginToEndInterval at: index put: (beginToEndInterval at: index) + 1.
+							counter := counter + 1 ] ].
 
 			counter := axisSize.
 			clues reverse
 				doWithIndex: [ :clue :index | 
+					(clue possibleInterval includes: counter) ifFalse: [ counter := clue possibleInterval max ].
 					endToBeginInterval
 						at: clues size - index + 1
 						put:
@@ -45,7 +50,11 @@ NSOverlapSolver >> resolve [
 								clueValue: clue value
 								forClues: clues
 								shiftFurther: false).
-					counter := counter - clue value - 1 ].
+					counter := counter - clue value - 1.
+					"If the interval is followed by filled cases, then we can move it to embded it."
+					[ counter + 1 > 0 and: [ (clues inGridAt: counter + 1) isFilled ] ]
+						whileTrue: [ endToBeginInterval at: clues size - index + 1 put: ( endToBeginInterval at: clues size - index + 1) - 1.
+							counter := counter - 1 ] ].
 
 			counter := 1.
 			beginToEndInterval
@@ -60,6 +69,7 @@ NSOverlapSolver >> resolve [
 NSOverlapSolver >> tryToShiftInterval: possibleInterval clueValue: clueValue forClues: clues shiftFurther: aBoolean [
 	| initialInterval shiftedInterval |
 	initialInterval := possibleInterval.
+	self flag: #todo. "This might not be needed anymore since we start at the beginning of the possible interval of the clue and the check probably remove the empty cases from the possible interval if it's close to a border."
 	[ shiftedInterval := self
 		tryToShiftOnceInterval: initialInterval
 		clueValue: clueValue
