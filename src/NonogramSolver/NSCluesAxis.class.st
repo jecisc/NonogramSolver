@@ -62,17 +62,27 @@ NSCluesAxis >> check [
 	self checkIfFilledIntervalCanFinishAClue.
 	self checkPossibleIntervalsCanBeShortenWithEmptyCases.
 	self checkPossibleIntervalsCanBeShortenWithFilledCasesBelongingToOnlyOneClue.
+	self checkAllFilledIntervalsOfTheSizeOfTheirMatchingCluesAreSurroundedByEmptyCases.
+	self flag: #todo. "Maybe filled intervals that are partly in a clue but not entirely?"
 	clues do: #check.
 	self checkIfAllCluesAreSolvedThatTheAxeIsResolved
 ]
 
 { #category : #checking }
+NSCluesAxis >> checkAllFilledIntervalsOfTheSizeOfTheirMatchingCluesAreSurroundedByEmptyCases [
+	self gridAxis filledIntervals
+		do: [ :filledInterval | 
+			(self unresolvedClues select: [ :clue | clue possibleInterval includesAll: filledInterval ])
+				ifNotEmpty: [ :matchingClues | 
+					(filledInterval size = matchingClues anyOne value and: [ matchingClues size > 1 and: [ (matchingClues collect: #value) asSet size = 1 ] ])
+						ifTrue: [ filledInterval min = 1 ifFalse: [ self inGridAt: filledInterval min - 1 put: NSEmptyState ].
+							filledInterval max = self axisSize ifFalse: [ self inGridAt: filledInterval max + 1 put: NSEmptyState ] ] ] ]
+]
+
+{ #category : #checking }
 NSCluesAxis >> checkIfAllCluesAreSolvedThatTheAxeIsResolved [
 	(self unresolvedClues isEmpty and: [ self isResolved not ])
-		ifTrue: [ self gridAxis
-				doWithIndex: [ :state :index | 
-					state isKnown
-						ifFalse: [ self ifLineClues: [ self grid at: self index at: index put: NSEmptyState ] ifColumnClues: [ self grid at: index at: self index put: NSEmptyState ] ] ] ]
+		ifTrue: [ self gridAxis doWithIndex: [ :state :index | state isKnown ifFalse: [ self inGridAt: index put: NSEmptyState ] ] ]
 ]
 
 { #category : #checking }
@@ -178,6 +188,11 @@ NSCluesAxis >> ifEmpty: aBlockClosure [
 { #category : #testing }
 NSCluesAxis >> ifLineClues: aBlockClosure ifColumnClues: aBlockClosure2 [ 
 	^ cluesList ifLineClues: aBlockClosure ifColumnClues: aBlockClosure2 
+]
+
+{ #category : #accessing }
+NSCluesAxis >> inGridAt: index put: aState [
+	self ifLineClues: [ self grid at: self index at: index put: aState ] ifColumnClues: [ self grid at: index at: self index put: aState ]
 ]
 
 { #category : #accessing }

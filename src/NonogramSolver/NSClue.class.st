@@ -36,11 +36,6 @@ NSClue >> axis: anObject [
 ]
 
 { #category : #accessing }
-NSClue >> axisIndex [
-	^ axis index
-]
-
-{ #category : #accessing }
 NSClue >> banFromPossibleInterval: anInterval [
 	"Remove the interval as parameter from the possible interval."
 
@@ -76,10 +71,7 @@ NSClue >> checkIsSolved [
 	
 	"If the clue is not solved but the possible interval is of the size of the value, we can mark it as solved and ensure the grid is filled."
 	self solved.
-	possibleInterval do: [ :intervalIndex | 
-		self
-			ifLineClue: [ self grid at: self axisIndex at: intervalIndex put: NSFilledState ]
-			ifColumnClue: [ self grid at: intervalIndex at: self axisIndex put: NSFilledState ] ].
+	possibleInterval do: [ :intervalIndex | self axis inGridAt: intervalIndex put: NSFilledState ].
 		
 	^ true
 ]

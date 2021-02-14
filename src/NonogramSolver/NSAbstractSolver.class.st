@@ -53,6 +53,9 @@ NSAbstractSolver >> axisAt: axisIndex at: index for: clues [
 
 { #category : #resolve }
 NSAbstractSolver >> axisAt: axisIndex at: index put: aClass for: clues [
+	self flag: #todo. "axisIndex is probably always the index of #clues. Thus, we can remove it from here and just call #inGridAt:put:. 
+	Maybe we can also totally remove #axisIndex to use #index on clues?"
+
 	clues ifLineClues: [ self at: axisIndex at: index put: aClass ] ifColumnClues: [ self at: index at: axisIndex put: aClass ]
 ]
 
