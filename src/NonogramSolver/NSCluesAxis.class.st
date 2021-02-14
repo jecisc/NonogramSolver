@@ -63,6 +63,7 @@ NSCluesAxis >> check [
 	self checkPossibleIntervalsCanBeShortenWithEmptyCases.
 	self checkPossibleIntervalsCanBeShortenWithFilledCasesBelongingToOnlyOneClue.
 	self checkIfFilledIntervalAreEntirelyInClues.
+	self checkIfFilledIntervalsAreBiggerThanClueValue.
 	self checkAllFilledIntervalsOfTheSizeOfTheirMatchingCluesAreSurroundedByEmptyCases.
 	clues do: #check.
 	self checkIfAllCluesAreSolvedThatTheAxeIsResolved
@@ -112,6 +113,14 @@ NSCluesAxis >> checkIfFilledIntervalCanFinishAClue [
 	| possibleCluesForFilledIntervals |
 	possibleCluesForFilledIntervals := (self gridAxis filledIntervals collect: [ :interval | interval -> (self possibleCluesForFilledInterval: interval) ]) asDictionary.
 	possibleCluesForFilledIntervals keysAndValuesDo: [ :interval :cls | (cls size = 1 and: [ cls anyOne value = interval size ]) ifTrue: [ cls anyOne restrainPossibleIntervalWith: interval ] ]
+]
+
+{ #category : #checking }
+NSCluesAxis >> checkIfFilledIntervalsAreBiggerThanClueValue [
+	self gridAxis filledIntervals
+		do: [ :filledInterval | 
+			(self unresolvedClues select: [ :clue | clue possibleInterval includesAny: filledInterval ])
+				ifNotEmpty: [ :matchingClues | matchingClues do: [ :clue | clue value < filledInterval size ifTrue: [ clue banFromPossibleInterval: filledInterval ] ] ] ]
 ]
 
 { #category : #checking }

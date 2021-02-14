@@ -16,7 +16,7 @@ NSPushBorderSolver class >> priority [
 NSPushBorderSolver >> resolve [
 	self
 		withUnfinishedAxisDo: [ :clues :axisSize | 
-			"	clues ifLineClues: [ (axisIndex = 15) ifTrue: [ 1halt. ] ] ifColumnClues: [  ]."
+				"clues ifLineClues: [ (clues index = 3) ifTrue: [ 1halt. ] ] ifColumnClues: [  ]."
 			"
 		clues gridAxis
 		"
