@@ -18,30 +18,27 @@ NSPushBorderSolver >> resolve [
 		withUnfinishedAxisDo: [ :clues :axisSize | 
 			"	clues ifLineClues: [ (axisIndex = 15) ifTrue: [ 1halt. ] ] ifColumnClues: [  ]."
 			"
-		resolver grid lineAt: axisIndex.
+		clues gridAxis
 		"
-			| indexOfFirstNotEmptyCase indexOfFirstFilledCase firstUnresolvedClue indexOfCloseEmptyCase |
-			self flag: #todo.	"do not stop at the first known but the first known and unresolved. Can check the first unsolved clue."
-			"			firstUnresolvedClue := clues unresolvedClues first.
-			(((firstUnresolvedClue possibleInterval min - firstUnresolvedClue value) max: 0) to: ((firstUnresolvedClue possibleInterval min - 1) max: 0)) select: [ :each |  ]
-			1halt."
-			indexOfFirstNotEmptyCase := 1.
-			[ indexOfFirstNotEmptyCase > axisSize or: [ (clues inGridAt: indexOfFirstNotEmptyCase) isEmpty not ] ]
-				whileFalse: [ indexOfFirstNotEmptyCase := indexOfFirstNotEmptyCase + 1 ].
-			indexOfFirstFilledCase := 1.
-			[ indexOfFirstFilledCase > axisSize or: [ (clues inGridAt: indexOfFirstFilledCase) isFilled ] ]
-				whileFalse: [ indexOfFirstFilledCase := indexOfFirstFilledCase + 1 ].
-			(indexOfFirstFilledCase < axisSize and: [ indexOfFirstNotEmptyCase + clues first value > indexOfFirstFilledCase ])
-				ifTrue: [ indexOfFirstFilledCase to: indexOfFirstNotEmptyCase + clues first value - 1 do: [ :index | clues inGridAt: index put: NSFilledState ] ].
+			clues unresolvedClues
+				do: [ :clue | 
+					(((clue possibleInterval min - clue value max: 0) to: (clue possibleInterval min - 1 max: 0))
+						select: [ :index | index = 0 or: [ (clues inGridAt: index) isEmpty ] ])
+						ifNotEmpty: [ :emptyCases | 
+							| indexOfCloseEmptyCase |
+							indexOfCloseEmptyCase := emptyCases max.
+							clue possibleInterval
+								detect: [ :index | (clues select: [ :c | c possibleInterval includes: index ]) size = 1 and: [ (clues inGridAt: index) isFilled ] ]
+								ifFound:
+									[ :indexOfFirstFilledCaseSpecificToClue | indexOfFirstFilledCaseSpecificToClue + 1 to: indexOfCloseEmptyCase + clue value do: [ :index | clues inGridAt: index put: NSFilledState ] ] ].
 
-
-			self flag: #todo.	"do not stop at the first known but the first known and unresolved. Can check the first unsolved clue."
-			indexOfFirstNotEmptyCase := axisSize.
-			[ indexOfFirstNotEmptyCase < 1 or: [ (clues inGridAt: indexOfFirstNotEmptyCase) isEmpty not ] ]
-				whileFalse: [ indexOfFirstNotEmptyCase := indexOfFirstNotEmptyCase - 1 ].
-			indexOfFirstFilledCase := axisSize.
-			[ indexOfFirstFilledCase < 1 or: [ (clues inGridAt: indexOfFirstFilledCase) isFilled ] ]
-				whileFalse: [ indexOfFirstFilledCase := indexOfFirstFilledCase - 1 ].
-			(indexOfFirstFilledCase > 1 and: [ indexOfFirstNotEmptyCase - clues last value < indexOfFirstFilledCase ])
-				ifTrue: [ (indexOfFirstNotEmptyCase - clues last value + 1 to: indexOfFirstFilledCase) do: [ :index | clues inGridAt: index put: NSFilledState ] ] ]
+					(((clue possibleInterval max + clue value min: axisSize + 1) to: (clue possibleInterval max + 1 min: axisSize + 1))
+						select: [ :index | index = (axisSize + 1) or: [ (clues inGridAt: index) isEmpty ] ])
+						ifNotEmpty: [ :emptyCases | 
+							| indexOfCloseEmptyCase |
+							indexOfCloseEmptyCase := emptyCases min.
+							clue possibleInterval reverse
+								detect: [ :index | (clues select: [ :c | c possibleInterval includes: index ]) size = 1 and: [ (clues inGridAt: index) isFilled ] ]
+								ifFound:
+									[ :indexOfFirstFilledCaseSpecificToClue | indexOfCloseEmptyCase - clue value to: indexOfFirstFilledCaseSpecificToClue - 1 do: [ :index | clues inGridAt: index put: NSFilledState ] ] ] ] ]
 ]

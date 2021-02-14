@@ -200,7 +200,7 @@ NSCluesAxis >> ifLineClues: aBlockClosure ifColumnClues: aBlockClosure2 [
 
 { #category : #accessing }
 NSCluesAxis >> inGridAt: index [
-	self ifLineClues: [ self grid at: self index at: index ] ifColumnClues: [ self grid at: index at: self index ]
+	^ self ifLineClues: [ self grid at: self index at: index ] ifColumnClues: [ self grid at: index at: self index ]
 ]
 
 { #category : #accessing }
@@ -261,6 +261,11 @@ NSCluesAxis >> printOn: aStream [
 { #category : #accessing }
 NSCluesAxis >> reverse [
 	^ clues reverse
+]
+
+{ #category : #enumerating }
+NSCluesAxis >> select: aBlockClosure [ 
+	^ clues select: aBlockClosure
 ]
 
 { #category : #accessing }
