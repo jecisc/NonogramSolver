@@ -199,6 +199,11 @@ NSCluesAxis >> ifLineClues: aBlockClosure ifColumnClues: aBlockClosure2 [
 ]
 
 { #category : #accessing }
+NSCluesAxis >> inGridAt: index [
+	self ifLineClues: [ self grid at: self index at: index ] ifColumnClues: [ self grid at: index at: self index ]
+]
+
+{ #category : #accessing }
 NSCluesAxis >> inGridAt: index put: aState [
 	self ifLineClues: [ self grid at: self index at: index put: aState ] ifColumnClues: [ self grid at: index at: self index put: aState ]
 ]

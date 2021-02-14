@@ -16,5 +16,5 @@ NSAllEmptyFilledSolver class >> priority [
 
 { #category : #resolve }
 NSAllEmptyFilledSolver >> resolve [
-	self withUnfinishedAxisDo: [ :axisIndex :clues :axisSize | clues ifEmpty: [ 1 to: axisSize do: [ :index | self axisAt: axisIndex at: index put: NSEmptyState for: clues ] ] ]
+	self withUnfinishedAxisDo: [ :clues :axisSize | clues ifEmpty: [ 1 to: axisSize do: [ :index | clues inGridAt: index put: NSEmptyState ] ] ]
 ]

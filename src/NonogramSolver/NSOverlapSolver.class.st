@@ -15,7 +15,7 @@ NSOverlapSolver class >> priority [
 { #category : #resolving }
 NSOverlapSolver >> resolve [
 	self
-		withUnfinishedAxisDo: [ :axisIndex :clues :axisSize | 
+		withUnfinishedAxisDo: [ :clues :axisSize | 
 			| endToBeginInterval beginToEndInterval |
 			self flag: #todo.	"Use already filled items on the line. Use empty cases on the line."
 			beginToEndInterval := Array new: clues size.
@@ -30,7 +30,6 @@ NSOverlapSolver >> resolve [
 							(self
 								tryToShiftInterval: (counter to: counter + clue value - 1)
 								clueValue: clue value
-								axisIndex: axisIndex
 								forClues: clues
 								shiftFurther: true).
 					counter := counter + clue value + 1 ].
@@ -44,7 +43,6 @@ NSOverlapSolver >> resolve [
 							(self
 								tryToShiftInterval: (counter - clue value + 1 to: counter)
 								clueValue: clue value
-								axisIndex: axisIndex
 								forClues: clues
 								shiftFurther: false).
 					counter := counter - clue value - 1 ].
@@ -54,24 +52,17 @@ NSOverlapSolver >> resolve [
 				with: endToBeginInterval
 				do: [ :int1 :int2 | 
 					(clues at: counter) restrainPossibleIntervalWith: (int1 min to: int2 max).
-					(int1 intersection: int2)
-						do: [ :index | 
-							self
-								axisAt: axisIndex
-								at: index
-								put: NSFilledState
-								for: clues ].
+					(int1 intersection: int2) do: [ :index | clues inGridAt: index put: NSFilledState ].
 					counter := counter + 1 ] ]
 ]
 
 { #category : #resolving }
-NSOverlapSolver >> tryToShiftInterval: possibleInterval clueValue: clueValue axisIndex: axisIndex forClues: clues shiftFurther: aBoolean [
+NSOverlapSolver >> tryToShiftInterval: possibleInterval clueValue: clueValue forClues: clues shiftFurther: aBoolean [
 	| initialInterval shiftedInterval |
 	initialInterval := possibleInterval.
 	[ shiftedInterval := self
 		tryToShiftOnceInterval: initialInterval
 		clueValue: clueValue
-		axisIndex: axisIndex
 		forClues: clues
 		shiftFurther: aBoolean.
 	initialInterval = shiftedInterval ] whileFalse: [ initialInterval := shiftedInterval ].	"As long as we can shift, we try to shift once again."
@@ -79,10 +70,10 @@ NSOverlapSolver >> tryToShiftInterval: possibleInterval clueValue: clueValue axi
 ]
 
 { #category : #resolving }
-NSOverlapSolver >> tryToShiftOnceInterval: possibleInterval clueValue: clueValue axisIndex: axisIndex forClues: clues shiftFurther: aBoolean [
+NSOverlapSolver >> tryToShiftOnceInterval: possibleInterval clueValue: clueValue forClues: clues shiftFurther: aBoolean [
 	| interval |
 	interval := possibleInterval.
-	(interval select: [ :i | (self axisAt: axisIndex at: i for: clues) isEmpty ])
+	(interval select: [ :i | (clues inGridAt: i) isEmpty ])
 		ifNotEmpty: [ :emptyCases | 
 			| shift |
 			shift := aBoolean

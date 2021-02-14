@@ -47,19 +47,6 @@ NSAbstractSolver >> at: anInteger at: anInteger2 put: aState [
 ]
 
 { #category : #accessing }
-NSAbstractSolver >> axisAt: axisIndex at: index for: clues [
-	^ clues ifLineClues: [ self at: axisIndex at: index ] ifColumnClues: [ self at: index at: axisIndex ]
-]
-
-{ #category : #resolve }
-NSAbstractSolver >> axisAt: axisIndex at: index put: aClass for: clues [
-	self flag: #todo. "axisIndex is probably always the index of #clues. Thus, we can remove it from here and just call #inGridAt:put:. 
-	Maybe we can also totally remove #axisIndex to use #index on clues?"
-
-	clues ifLineClues: [ self at: axisIndex at: index put: aClass ] ifColumnClues: [ self at: index at: axisIndex put: aClass ]
-]
-
-{ #category : #accessing }
 NSAbstractSolver >> clueForColumn: columnIndex [ 
 	^ resolver clueForColumn: columnIndex
 ]
@@ -108,10 +95,10 @@ NSAbstractSolver >> withUnfinishedAxisDo: aBlock [
 
 { #category : #resolve }
 NSAbstractSolver >> withUnfinishedColumnsDo: aBlock [
-	1 to: self numberOfColumns do: [ :columnIndex | (self columnIsAllKnown: columnIndex) ifFalse: [ aBlock cull: columnIndex cull: (self clueForColumn: columnIndex) cull: self numberOfLines ] ]
+	1 to: self numberOfColumns do: [ :columnIndex | (self columnIsAllKnown: columnIndex) ifFalse: [ aBlock cull: (self clueForColumn: columnIndex) cull: self numberOfLines ] ]
 ]
 
 { #category : #resolve }
 NSAbstractSolver >> withUnfinishedLinesDo: aBlock [
-	1 to: self numberOfLines do: [ :lineIndex | (self lineIsAllKnown: lineIndex) ifFalse: [ aBlock cull: lineIndex cull: (self clueForLine: lineIndex) cull: self numberOfColumns ] ]
+	1 to: self numberOfLines do: [ :lineIndex | (self lineIsAllKnown: lineIndex) ifFalse: [ aBlock cull: (self clueForLine: lineIndex) cull: self numberOfColumns ] ]
 ]
