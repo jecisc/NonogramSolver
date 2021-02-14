@@ -62,8 +62,8 @@ NSCluesAxis >> check [
 	self checkIfFilledIntervalCanFinishAClue.
 	self checkPossibleIntervalsCanBeShortenWithEmptyCases.
 	self checkPossibleIntervalsCanBeShortenWithFilledCasesBelongingToOnlyOneClue.
+	self checkIfFilledIntervalAreEntirelyInClues.
 	self checkAllFilledIntervalsOfTheSizeOfTheirMatchingCluesAreSurroundedByEmptyCases.
-	self flag: #todo. "Maybe filled intervals that are partly in a clue but not entirely?"
 	clues do: #check.
 	self checkIfAllCluesAreSolvedThatTheAxeIsResolved
 ]
@@ -95,6 +95,14 @@ NSCluesAxis >> checkIfAxisIsFullyFilled [
 
 	"If all filled interval matches the clues, then the line is full and we can ensure the clues are updated."
 	filledIntervals doWithIndex: [ :interval :index | (self at: index) restrainPossibleIntervalWith: interval ]
+]
+
+{ #category : #checking }
+NSCluesAxis >> checkIfFilledIntervalAreEntirelyInClues [
+	self gridAxis filledIntervals
+		do: [ :filledInterval | 
+			(self unresolvedClues select: [ :clue | (clue possibleInterval includesAny: filledInterval) and: [ (clue possibleInterval includesAll: filledInterval) not ] ])
+				ifNotEmpty: [ :matchingClues | matchingClues do: [ :clue | clue banFromPossibleInterval: filledInterval ] ] ]
 ]
 
 { #category : #checking }
