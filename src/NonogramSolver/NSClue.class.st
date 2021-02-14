@@ -26,6 +26,13 @@ NSClue class >> clue: anInteger axis: anAxis [
 ]
 
 { #category : #accessing }
+NSClue >> addPossibleInterval: interval [
+	self assert: interval min <= interval max.
+	self assert: interval size >= value.
+	self possibleIntervals add: interval
+]
+
+{ #category : #accessing }
 NSClue >> axis [
 	^ axis
 ]
@@ -60,7 +67,17 @@ NSClue >> banFromPossibleInterval: anInterval [
 
 { #category : #testing }
 NSClue >> canInclude: anIndex [
-	^ self deprecatedPossibleInterval includes: anIndex
+	^ self possibleIntervals anySatisfy: [ :int | int includes: anIndex]
+]
+
+{ #category : #testing }
+NSClue >> canIncludeAll: aCollection [
+	^ self possibleIntervals anySatisfy: [ :int | int includesAll: aCollection ]
+]
+
+{ #category : #testing }
+NSClue >> canIncludeAny: aCollection [
+	^ self possibleIntervals anySatisfy: [ :int | int includesAny: aCollection ]
 ]
 
 { #category : #testing }
@@ -94,7 +111,7 @@ NSClue >> checkIsSolved [
 { #category : #accessing }
 NSClue >> deprecatedPossibleInterval [
 	self deprecated: 'Refactoring in progress.'.
-	^ self possibleIntervals min to: self possibleIntervals max
+	^ self possibleIntervals first min to: self possibleIntervals last max
 ]
 
 { #category : #accessing }
@@ -122,7 +139,7 @@ NSClue >> index [
 NSClue >> initialize [
 	super initialize.
 	isSolved := false.
-	possibleIntervals := OrderedCollection new
+	possibleIntervals := SortedCollection sortUsing: #min ascending
 ]
 
 { #category : #accessing }
@@ -136,17 +153,23 @@ NSClue >> isSolved: anObject [
 ]
 
 { #category : #accessing }
+NSClue >> possibleInterval [
+	"Return the smallest interval containing all the possible intrevals of the clue."
+
+	self possibleIntervals size = 1 ifTrue: [ ^ self possibleIntervals anyOne ].
+
+	^ self possibleIntervals first min to: self possibleIntervals last max
+]
+
+{ #category : #accessing }
 NSClue >> possibleIntervals [
 	^ possibleIntervals
 ]
 
 { #category : #accessing }
 NSClue >> possibleIntervals: aCollection [
-	aCollection
-		allSatisfy: [ :interval | 
-			self assert: interval min <= interval max.
-			self assert: interval size >= value ].
-	possibleIntervals := aCollection
+	possibleIntervals removeAll.
+	aCollection do: [ :interval | self addPossibleInterval: interval ]
 ]
 
 { #category : #printing }
@@ -155,8 +178,13 @@ NSClue >> printOn: aStream [
 	aStream
 		nextPutAll: ' [';
 		print: value;
-		nextPutAll: ', ';
-		print: self deprecatedPossibleInterval;
+		nextPutAll: ', '.
+	self possibleIntervals size = 1
+		ifTrue: [ aStream print: self possibleIntervals anyOne ]
+		ifFalse: [ aStream nextPut: ${.
+			self possibleIntervals do: [ :int | aStream print: int ] separatedBy: [ aStream nextPutAll: ' . ' ].
+			aStream nextPut: $} ].
+	aStream
 		nextPutAll:
 			(isSolved
 				ifTrue: [ ', solved]' ]
