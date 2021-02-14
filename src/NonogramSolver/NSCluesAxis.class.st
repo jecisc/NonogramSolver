@@ -61,6 +61,7 @@ NSCluesAxis >> check [
 	self checkIfAxisIsFullyFilled.
 	self checkIfFilledIntervalCanFinishAClue.
 	self checkPossibleIntervalsCanBeShortenWithEmptyCases.
+	self checkPossibleIntervalsCanBeShortenWithFilledCasesBelongingToOnlyOneClue.
 	clues do: #check.
 	self checkIfAllCluesAreSolvedThatTheAxeIsResolved
 ]
@@ -112,6 +113,16 @@ NSCluesAxis >> checkPossibleIntervalsCanBeShortenWithEmptyCases [
 
 							intervalToConsider := index to: clue possibleInterval max.
 							intervalToConsider size <= clue value ifTrue: [ clue banFromPossibleInterval: intervalToConsider ] ] ] ]
+]
+
+{ #category : #checking }
+NSCluesAxis >> checkPossibleIntervalsCanBeShortenWithFilledCasesBelongingToOnlyOneClue [
+	self gridAxis filledIntervals flattened
+		select: [ :filledIndex | (self unresolvedClues select: [ :clue | clue possibleInterval includes: filledIndex ]) size = 1 ]
+		thenDo: [ :filledIndexAssociatedToOneClue | 
+			self unresolvedClues
+				detect: [ :clue | clue possibleInterval includes: filledIndexAssociatedToOneClue ]
+				ifFound: [ :clue | clue restrainPossibleIntervalWith: (filledIndexAssociatedToOneClue - clue value + 1 to: filledIndexAssociatedToOneClue + clue value - 1) ] ]
 ]
 
 { #category : #accessing }
