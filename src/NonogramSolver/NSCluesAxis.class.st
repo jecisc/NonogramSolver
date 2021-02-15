@@ -49,9 +49,9 @@ NSCluesAxis >> banIntervalOf: aNSClue [
 	clues
 		doWithIndex: [ :clue :index | 
 			"If we have a clue before the solved clue, we remove everything after the case before this clue."
-			index < indexOfSolvedClue ifTrue: [ clue banFromPossibleInterval: (aNSClue deprecatedPossibleInterval min - 1 to: self axisSize) ].
+			index < indexOfSolvedClue ifTrue: [ clue ban: (aNSClue deprecatedPossibleInterval min - 1 to: self axisSize) ].
 			"If we have a clue after the solved clue, we remove everything before the case of after this clue"
-			index > indexOfSolvedClue ifTrue: [ clue banFromPossibleInterval: (1 to: aNSClue deprecatedPossibleInterval max + 1) ] ]
+			index > indexOfSolvedClue ifTrue: [ clue ban: (1 to: aNSClue deprecatedPossibleInterval max + 1) ] ]
 ]
 
 { #category : #checking }
@@ -95,7 +95,7 @@ NSCluesAxis >> checkIfAxisIsFullyFilled [
 	filledIntervals doWithIndex: [ :interval :index | (interval size = (self at: index) value) ifFalse: [ ^ self ] ].
 
 	"If all filled interval matches the clues, then the line is full and we can ensure the clues are updated."
-	filledIntervals doWithIndex: [ :interval :index | (self at: index) restrainPossibleIntervalWith: interval ]
+	filledIntervals doWithIndex: [ :interval :index | (self at: index) restrainTo: interval ]
 ]
 
 { #category : #checking }
@@ -103,7 +103,7 @@ NSCluesAxis >> checkIfFilledIntervalAreEntirelyInClues [
 	self gridAxis filledIntervals
 		do: [ :filledInterval | 
 			(self unresolvedClues select: [ :clue | (clue canIncludeAny: filledInterval) and: [ (clue canIncludeAll: filledInterval) not ] ])
-				ifNotEmpty: [ :matchingClues | matchingClues do: [ :clue | clue banFromPossibleInterval: filledInterval ] ] ]
+				ifNotEmpty: [ :matchingClues | matchingClues do: [ :clue | clue ban: filledInterval ] ] ]
 ]
 
 { #category : #checking }
@@ -112,7 +112,7 @@ NSCluesAxis >> checkIfFilledIntervalCanFinishAClue [
 
 	| possibleCluesForFilledIntervals |
 	possibleCluesForFilledIntervals := (self gridAxis filledIntervals collect: [ :interval | interval -> (self possibleCluesForFilledInterval: interval) ]) asDictionary.
-	possibleCluesForFilledIntervals keysAndValuesDo: [ :interval :cls | (cls size = 1 and: [ cls anyOne value = interval size ]) ifTrue: [ cls anyOne restrainPossibleIntervalWith: interval ] ]
+	possibleCluesForFilledIntervals keysAndValuesDo: [ :interval :cls | (cls size = 1 and: [ cls anyOne value = interval size ]) ifTrue: [ cls anyOne restrainTo: interval ] ]
 ]
 
 { #category : #checking }
@@ -131,7 +131,7 @@ NSCluesAxis >> checkIfFilledIntervalsAreBiggerThanClueValue [
 										ifFalse: [ intervalToBan := (0 max: filledInterval min - clue value - 1) to: intervalToBan max ].
 									(clue canInclude: filledInterval max + clue value + 1)
 										ifFalse: [ intervalToBan := intervalToBan min to: (self axisSize min: filledInterval max + clue value + 1) ].
-									clue banFromPossibleInterval: intervalToBan ] ] ] ]
+									clue ban: intervalToBan ] ] ] ]
 ]
 
 { #category : #checking }
@@ -147,10 +147,10 @@ NSCluesAxis >> checkPossibleIntervalsCanBeShortenWithEmptyCases [
 						thenDo: [ :index | 
 							| intervalToConsider |
 							intervalToConsider := clue deprecatedPossibleInterval min to: index.
-							intervalToConsider size <= clue value ifTrue: [ clue banFromPossibleInterval: intervalToConsider ].
+							intervalToConsider size <= clue value ifTrue: [ clue ban: intervalToConsider ].
 
 							intervalToConsider := index to: clue deprecatedPossibleInterval max.
-							intervalToConsider size <= clue value ifTrue: [ clue banFromPossibleInterval: intervalToConsider ] ] ] ]
+							intervalToConsider size <= clue value ifTrue: [ clue ban: intervalToConsider ] ] ] ]
 ]
 
 { #category : #checking }
@@ -160,7 +160,7 @@ NSCluesAxis >> checkPossibleIntervalsCanBeShortenWithFilledCasesBelongingToOnlyO
 		thenDo: [ :filledIndexAssociatedToOneClue | 
 			self unresolvedClues
 				detect: [ :clue | clue canInclude: filledIndexAssociatedToOneClue ]
-				ifFound: [ :clue | clue restrainPossibleIntervalWith: (filledIndexAssociatedToOneClue - clue value + 1 to: filledIndexAssociatedToOneClue + clue value - 1) ] ]
+				ifFound: [ :clue | clue restrainTo: (filledIndexAssociatedToOneClue - clue value + 1 to: filledIndexAssociatedToOneClue + clue value - 1) ] ]
 ]
 
 { #category : #accessing }

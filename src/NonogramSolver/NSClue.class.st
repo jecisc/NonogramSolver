@@ -43,7 +43,7 @@ NSClue >> axis: anObject [
 ]
 
 { #category : #accessing }
-NSClue >> banFromPossibleInterval: anInterval [
+NSClue >> ban: anInterval [
 	"Remove the interval as parameter from the possible interval."
 
 	self isSolved ifTrue: [ ^ self ].
@@ -88,11 +88,11 @@ NSClue >> check [
 NSClue >> checkIsSolved [
 	isSolved ifTrue: [ ^ true ].
 	
-	self deprecatedPossibleInterval size = value ifFalse: [ ^ false ].
+	self possibleInterval size = value ifFalse: [ ^ false ].
 	
 	"If the clue is not solved but the possible interval is of the size of the value, we can mark it as solved and ensure the grid is filled."
 	self solved.
-	self deprecatedPossibleInterval do: [ :intervalIndex | self axis inGridAt: intervalIndex put: NSFilledState ].
+	self possibleInterval do: [ :intervalIndex | self axis inGridAt: intervalIndex put: NSFilledState ].
 		
 	^ true
 ]
@@ -181,7 +181,7 @@ NSClue >> printOn: aStream [
 ]
 
 { #category : #accessing }
-NSClue >> restrainPossibleIntervalWith: anInterval [ 
+NSClue >> restrainTo: anInterval [ 
 	self isSolved ifTrue: [ ^ self ].
 
 	self deprecatedPossibleInterval: (((self deprecatedPossibleInterval min) max: anInterval min) to: ((self deprecatedPossibleInterval max) min: anInterval max)).
