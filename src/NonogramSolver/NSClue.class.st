@@ -80,16 +80,6 @@ NSClue >> canIncludeAny: aCollection [
 	^ self possibleIntervals anySatisfy: [ :int | int includesAny: aCollection ]
 ]
 
-{ #category : #testing }
-NSClue >> canIncludeAll: aCollection [
-	^ possibleInterval includesAll: aCollection
-]
-
-{ #category : #testing }
-NSClue >> canIncludeAny: aCollection [
-	^ possibleInterval includesAny: aCollection
-]
-
 { #category : #checking }
 NSClue >> check [
 	self checkIsSolved

@@ -156,13 +156,11 @@ NSCluesAxis >> checkPossibleIntervalsCanBeShortenWithEmptyCases [
 { #category : #checking }
 NSCluesAxis >> checkPossibleIntervalsCanBeShortenWithFilledCasesBelongingToOnlyOneClue [
 	self gridAxis filledIntervals flattened
-		do: [ :filledIndex | 
-			(self unresolvedClues select: [ :clue | clue canInclude: filledIndex ])
-				ifNotEmpty: [ :cluesMatchingFilledIndex | 
-					clues size = 1
-						ifTrue: [ | clue |
-							clue := cluesMatchingFilledIndex anyOne.
-							clue restrainPossibleIntervalWith: (filledIndex - clue value + 1 to: filledIndex + clue value - 1) ] ] ]
+		select: [ :filledIndex | (self unresolvedClues select: [ :clue | clue canInclude: filledIndex ]) size = 1 ]
+		thenDo: [ :filledIndexAssociatedToOneClue | 
+			self unresolvedClues
+				detect: [ :clue | clue canInclude: filledIndexAssociatedToOneClue ]
+				ifFound: [ :clue | clue restrainPossibleIntervalWith: (filledIndexAssociatedToOneClue - clue value + 1 to: filledIndexAssociatedToOneClue + clue value - 1) ] ]
 ]
 
 { #category : #accessing }
