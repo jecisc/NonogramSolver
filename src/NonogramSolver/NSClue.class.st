@@ -42,25 +42,8 @@ NSClue >> axis: anObject [
 	axis := anObject
 ]
 
-{ #category : #'as yet unclassified' }
-NSClue >> ban: anInterval fromPossibleInterval: possibleInterval [
-	"Cut part of all the possible interval in parameter to not include the other interval in parameter."
-
-	"In all cases, we need to remove the current interval from the possible intervals."
-
-	self possibleIntervals remove: possibleInterval.
-
-	"If we need to ban the full interval, no need to add anything back to the list of possible intervals."
-	(anInterval includesAll: possibleInterval) ifTrue: [ ^ self ].
-	((possibleInterval includes: anInterval min) and: [ possibleInterval includes: anInterval max ])
-		ifTrue: [ "In that case we need to split the interval."
-			self addPossibleInterval: (possibleInterval min to: anInterval min - 1).
-			self addPossibleInterval: (anInterval max + 1 to: possibleInterval max) ]
-		ifFalse: [ 1 halt ]
-]
-
 { #category : #accessing }
-NSClue >> banFromPossibleIntervals: anInterval [
+NSClue >> ban: anInterval [
 	"Remove the interval as parameter from the possible intervals."
 
 	| intervalsToUpdate |
@@ -76,6 +59,23 @@ NSClue >> banFromPossibleIntervals: anInterval [
 	intervalsToUpdate do: [ :interval | self ban: anInterval fromPossibleInterval: interval ].
 
 	self checkIsSolved
+]
+
+{ #category : #'as yet unclassified' }
+NSClue >> ban: anInterval fromPossibleInterval: possibleInterval [
+	"Cut part of all the possible interval in parameter to not include the other interval in parameter."
+
+	"In all cases, we need to remove the current interval from the possible intervals."
+
+	self possibleIntervals remove: possibleInterval.
+
+	"If we need to ban the full interval, no need to add anything back to the list of possible intervals."
+	(anInterval includesAll: possibleInterval) ifTrue: [ ^ self ].
+	((possibleInterval includes: anInterval min) and: [ possibleInterval includes: anInterval max ])
+		ifTrue: [ "In that case we need to split the interval."
+			self addPossibleInterval: (possibleInterval min to: anInterval min - 1).
+			self addPossibleInterval: (anInterval max + 1 to: possibleInterval max) ]
+		ifFalse: [ 1 halt ]
 ]
 
 { #category : #testing }
@@ -195,7 +195,7 @@ NSClue >> printOn: aStream [
 ]
 
 { #category : #accessing }
-NSClue >> restrainPossibleIntervalsWith: anInterval [ 
+NSClue >> restrainTo: anInterval [ 
 	| intervalsToUpdate |
 	self isSolved ifTrue: [ ^ self ].
 
