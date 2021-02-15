@@ -15,9 +15,6 @@ NSFillEmptyCaseOutOfAllCluesSolver >> resolve [
 		withUnfinishedAxisDo: [ :clues :axisSize | 
 			(clues
 				inject: (1 to: axisSize) asOrderedCollection
-				into: [ :coll :clue | 
-					coll
-						removeAllFoundIn: clue deprecatedPossibleInterval;
-						yourself ])
+				into: [ :coll :clue | coll removeAllSuchThat: [ :index | clue canInclude: index ]])
 				ifNotEmpty: [ :toFillWithEmpty | toFillWithEmpty do: [ :index | clues inGridAt: index put: NSEmptyState ] ] ]
 ]

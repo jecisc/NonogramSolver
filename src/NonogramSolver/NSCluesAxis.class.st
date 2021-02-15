@@ -142,15 +142,16 @@ NSCluesAxis >> checkPossibleIntervalsCanBeShortenWithEmptyCases [
 		ifNotEmpty: [ :emptyIndexes | 
 			self unresolvedClues
 				do: [ :clue | 
-					emptyIndexes
-						select: [ :index | clue canInclude: index ]
-						thenDo: [ :index | 
-							| intervalToConsider |
-							intervalToConsider := clue deprecatedPossibleInterval min to: index.
-							intervalToConsider size <= clue value ifTrue: [ clue ban: intervalToConsider ].
+					emptyIndexes do: [ :index | 
+						clue possibleIntervals
+							select: [ :interval | interval includes: index ]
+							thenDo: [ :interval |
+								| intervalToConsider |
+								intervalToConsider := interval min to: index.
+								intervalToConsider size <= clue value ifTrue: [ clue ban: intervalToConsider ].
 
-							intervalToConsider := index to: clue deprecatedPossibleInterval max.
-							intervalToConsider size <= clue value ifTrue: [ clue ban: intervalToConsider ] ] ] ]
+								intervalToConsider := index to: interval max.
+								intervalToConsider size <= clue value ifTrue: [ clue ban: intervalToConsider ] ] ] ] ]
 ]
 
 { #category : #checking }
