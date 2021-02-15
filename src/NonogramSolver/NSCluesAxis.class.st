@@ -197,6 +197,11 @@ NSCluesAxis >> cluesList: anObject [
 ]
 
 { #category : #enumerating }
+NSCluesAxis >> collectWithIndex: aBlockClosure [ 
+	^ clues collectWithIndex: aBlockClosure
+]
+
+{ #category : #enumerating }
 NSCluesAxis >> do: aBlockClosure [ 
 	clues do: aBlockClosure
 ]
