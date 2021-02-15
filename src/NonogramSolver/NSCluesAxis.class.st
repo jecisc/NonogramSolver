@@ -49,9 +49,9 @@ NSCluesAxis >> banIntervalOf: aNSClue [
 	clues
 		doWithIndex: [ :clue :index | 
 			"If we have a clue before the solved clue, we remove everything after the case before this clue."
-			index < indexOfSolvedClue ifTrue: [ clue ban: (aNSClue deprecatedPossibleInterval min - 1 to: self axisSize) ].
+			index < indexOfSolvedClue ifTrue: [ clue ban: (aNSClue possibleInterval min - 1 to: self axisSize) ].
 			"If we have a clue after the solved clue, we remove everything before the case of after this clue"
-			index > indexOfSolvedClue ifTrue: [ clue ban: (1 to: aNSClue deprecatedPossibleInterval max + 1) ] ]
+			index > indexOfSolvedClue ifTrue: [ clue ban: (1 to: aNSClue possibleInterval max + 1) ] ]
 ]
 
 { #category : #checking }

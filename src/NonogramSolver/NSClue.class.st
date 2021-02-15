@@ -48,18 +48,19 @@ NSClue >> ban: anInterval [
 
 	self isSolved ifTrue: [ ^ self ].
 
+	self
+		assert: (anInterval min < self possibleIntervals first min and: [ anInterval max > self possibleIntervals last max ]) not
+		description: 'The interval should not include all possible intervals, else this mean the clue has no solution.'.
+
 	"If the possible interval does not includes the interval in parameter, we do nothing."
 	(self canIncludeAny: anInterval) ifFalse: [ ^ self ].
 
-	(anInterval min > self deprecatedPossibleInterval min and: [ anInterval max < self deprecatedPossibleInterval max ])
-		ifTrue: [ self flag: #todo. "The interval should not be included inside the possible interval. This would split the possible interval in two. Maybe later I could manage possible intervalS but not now." ^ self ].
-
-	(anInterval min < self deprecatedPossibleInterval min and: [ anInterval max > self deprecatedPossibleInterval max ])
-		ifTrue: [ self error: 'The interval should not include the possible interval, else this mean the clue has no solution.' ].
-
-	"Remove all elements found in the interval and recast the collection as an interval."
-	self deprecatedPossibleInterval asOrderedCollection removeAllFoundIn: anInterval; in: [:i | 
-	self deprecatedPossibleInterval: (i min to: i max)].
+	(self possibleIntervals select: [ :interval | anInterval includesAny: interval ])
+		do: [ :intervalToUpdate | 
+			self possibleIntervals remove: intervalToUpdate.
+			(anInterval includesAll: intervalToUpdate)
+				ifFalse: [ intervalToUpdate min + value <= anInterval min ifTrue: [ self addPossibleInterval: (intervalToUpdate min to: anInterval min - 1) ].
+					intervalToUpdate max - value >= anInterval max ifTrue: [ self addPossibleInterval: (anInterval max + 1 to: intervalToUpdate max) ] ] ].
 
 	self checkIsSolved
 ]
