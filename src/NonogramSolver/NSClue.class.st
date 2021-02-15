@@ -178,7 +178,9 @@ NSClue >> restrainTo: anInterval [
 		do: [ :intervalToUpdate | 
 			self possibleIntervals remove: intervalToUpdate.
 			(anInterval includesAny: intervalToUpdate)
-				ifTrue: [ self addPossibleInterval: ((intervalToUpdate min max: anInterval min) to: (intervalToUpdate max min: anInterval max)) ] ].
+				ifTrue: [ | newInterval |
+					newInterval := (intervalToUpdate min max: anInterval min) to: (intervalToUpdate max min: anInterval max).
+					newInterval size >= value ifTrue: [ self addPossibleInterval: newInterval ] ] ].
 
 	self checkIsSolved
 ]
