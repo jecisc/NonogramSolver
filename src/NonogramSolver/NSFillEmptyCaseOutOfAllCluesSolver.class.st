@@ -17,7 +17,7 @@ NSFillEmptyCaseOutOfAllCluesSolver >> resolve [
 				inject: (1 to: axisSize) asOrderedCollection
 				into: [ :coll :clue | 
 					coll
-						removeAllFoundIn: clue possibleInterval;
+						removeAllFoundIn: clue deprecatedPossibleInterval;
 						yourself ])
 				ifNotEmpty: [ :toFillWithEmpty | toFillWithEmpty do: [ :index | clues inGridAt: index put: NSEmptyState ] ] ]
 ]

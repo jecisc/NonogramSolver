@@ -2,7 +2,7 @@ Class {
 	#name : #NSClue,
 	#superclass : #Object,
 	#instVars : [
-		'possibleInterval',
+		'possibleIntervals',
 		'isSolved',
 		'value',
 		'axis'
@@ -44,23 +44,23 @@ NSClue >> banFromPossibleInterval: anInterval [
 	"If the possible interval does not includes the interval in parameter, we do nothing."
 	(self canIncludeAny: anInterval) ifFalse: [ ^ self ].
 
-	(anInterval min > possibleInterval min and: [ anInterval max < possibleInterval max ])
+	(anInterval min > self deprecatedPossibleInterval min and: [ anInterval max < self deprecatedPossibleInterval max ])
 		ifTrue: [ self flag: #todo. "The interval should not be included inside the possible interval. This would split the possible interval in two. Maybe later I could manage possible intervalS but not now." ^ self ].
 
-	(anInterval min < possibleInterval min and: [ anInterval max > possibleInterval max ])
+	(anInterval min < self deprecatedPossibleInterval min and: [ anInterval max > self deprecatedPossibleInterval max ])
 		ifTrue: [ self error: 'The interval should not include the possible interval, else this mean the clue has no solution.' ].
 
 	"Remove all elements found in the interval and recast the collection as an interval."
-	possibleInterval := possibleInterval asOrderedCollection.
-	possibleInterval removeAllFoundIn: anInterval.
-	self possibleInterval: (possibleInterval min to: possibleInterval max).
+	self deprecatedPossibleInterval: self deprecatedPossibleInterval asOrderedCollection.
+	self deprecatedPossibleInterval removeAllFoundIn: anInterval.
+	self deprecatedPossibleInterval: (self deprecatedPossibleInterval min to: self deprecatedPossibleInterval max).
 
 	self checkIsSolved
 ]
 
 { #category : #testing }
 NSClue >> canInclude: anIndex [
-	^ possibleInterval includes: anIndex
+	^ self deprecatedPossibleInterval includes: anIndex
 ]
 
 { #category : #testing }
@@ -82,13 +82,25 @@ NSClue >> check [
 NSClue >> checkIsSolved [
 	isSolved ifTrue: [ ^ true ].
 	
-	possibleInterval size = value ifFalse: [ ^ false ].
+	self deprecatedPossibleInterval size = value ifFalse: [ ^ false ].
 	
 	"If the clue is not solved but the possible interval is of the size of the value, we can mark it as solved and ensure the grid is filled."
 	self solved.
-	possibleInterval do: [ :intervalIndex | self axis inGridAt: intervalIndex put: NSFilledState ].
+	self deprecatedPossibleInterval do: [ :intervalIndex | self axis inGridAt: intervalIndex put: NSFilledState ].
 		
 	^ true
+]
+
+{ #category : #accessing }
+NSClue >> deprecatedPossibleInterval [
+	self deprecated: 'Refactoring in progress.'.
+	^ self possibleIntervals min to: self possibleIntervals max
+]
+
+{ #category : #accessing }
+NSClue >> deprecatedPossibleInterval: anObject [
+	self deprecated: 'Refactoring in progress.'.
+	self possibleIntervals: { anObject } asOrderedCollection
 ]
 
 { #category : #accessing }
@@ -109,7 +121,8 @@ NSClue >> index [
 { #category : #initialization }
 NSClue >> initialize [
 	super initialize.
-	isSolved := false
+	isSolved := false.
+	possibleIntervals := OrderedCollection new
 ]
 
 { #category : #accessing }
@@ -123,15 +136,17 @@ NSClue >> isSolved: anObject [
 ]
 
 { #category : #accessing }
-NSClue >> possibleInterval [
-	^ possibleInterval
+NSClue >> possibleIntervals [
+	^ possibleIntervals
 ]
 
 { #category : #accessing }
-NSClue >> possibleInterval: anObject [
-	self assert: anObject min <= anObject max.
-	self assert: anObject size >= value.
-	possibleInterval := anObject
+NSClue >> possibleIntervals: aCollection [
+	aCollection
+		allSatisfy: [ :interval | 
+			self assert: interval min <= interval max.
+			self assert: interval size >= value ].
+	possibleIntervals := aCollection
 ]
 
 { #category : #printing }
@@ -141,7 +156,7 @@ NSClue >> printOn: aStream [
 		nextPutAll: ' [';
 		print: value;
 		nextPutAll: ', ';
-		print: possibleInterval;
+		print: self deprecatedPossibleInterval;
 		nextPutAll:
 			(isSolved
 				ifTrue: [ ', solved]' ]
@@ -152,7 +167,7 @@ NSClue >> printOn: aStream [
 NSClue >> restrainPossibleIntervalWith: anInterval [ 
 	self isSolved ifTrue: [ ^ self ].
 
-	self possibleInterval: (((possibleInterval min) max: anInterval min) to: ((possibleInterval max) min: anInterval max)).
+	self deprecatedPossibleInterval: (((self deprecatedPossibleInterval min) max: anInterval min) to: ((self deprecatedPossibleInterval max) min: anInterval max)).
 	self checkIsSolved
 ]
 
