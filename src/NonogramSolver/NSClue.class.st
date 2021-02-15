@@ -181,10 +181,16 @@ NSClue >> printOn: aStream [
 ]
 
 { #category : #accessing }
-NSClue >> restrainTo: anInterval [ 
+NSClue >> restrainTo: anInterval [
 	self isSolved ifTrue: [ ^ self ].
 
-	self deprecatedPossibleInterval: (((self deprecatedPossibleInterval min) max: anInterval min) to: ((self deprecatedPossibleInterval max) min: anInterval max)).
+	"Do not change the collection while iterating on it."
+	(self possibleIntervals reject: [ :int | anInterval includesAll: int ])
+		do: [ :intervalToUpdate | 
+			self possibleIntervals remove: intervalToUpdate.
+			(anInterval includesAny: intervalToUpdate)
+				ifTrue: [ self addPossibleInterval: ((intervalToUpdate min max: anInterval min) to: (intervalToUpdate max min: anInterval max)) ] ].
+
 	self checkIsSolved
 ]
 
