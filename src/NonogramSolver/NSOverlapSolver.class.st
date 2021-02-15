@@ -23,7 +23,7 @@ NSOverlapSolver >> resolve [
 			counter := 1.
 			clues
 				doWithIndex: [ :clue :index | 
-					(clue canInclude: counter) ifFalse: [ counter := clue deprecatedPossibleInterval min ].
+					(clue canInclude: counter) ifFalse: [ counter := clue possibleIntervals first min ].
 					beginToEndInterval
 						at: index
 						put:
@@ -41,7 +41,7 @@ NSOverlapSolver >> resolve [
 			counter := axisSize.
 			clues reverse
 				doWithIndex: [ :clue :index | 
-					(clue canInclude: counter) ifFalse: [ counter := clue deprecatedPossibleInterval max ].
+					(clue canInclude: counter) ifFalse: [ counter := clue possibleIntervals last max ].
 					endToBeginInterval
 						at: clues size - index + 1
 						put:

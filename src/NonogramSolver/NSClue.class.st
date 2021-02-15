@@ -99,18 +99,6 @@ NSClue >> checkIsSolved [
 ]
 
 { #category : #accessing }
-NSClue >> deprecatedPossibleInterval [
-	self deprecated: 'Refactoring in progress.'.
-	^ self possibleIntervals first min to: self possibleIntervals last max
-]
-
-{ #category : #accessing }
-NSClue >> deprecatedPossibleInterval: anObject [
-	self deprecated: 'Refactoring in progress.'.
-	self possibleIntervals: { anObject } asOrderedCollection
-]
-
-{ #category : #accessing }
 NSClue >> grid [
 	^ axis grid
 ]
