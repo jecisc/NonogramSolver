@@ -53,8 +53,23 @@ NSOverlapSolver >> resolve [
 					counter := counter - clue value - 1.
 					"If the interval is followed by filled cases, then we can move it to embded it."
 					[ counter + 1 > 0 and: [ (clues inGridAt: counter + 1) isFilled ] ]
-						whileTrue: [ endToBeginInterval at: clues size - index + 1 put: ( endToBeginInterval at: clues size - index + 1) - 1.
+						whileTrue: [ endToBeginInterval at: clues size - index + 1 put: (endToBeginInterval at: clues size - index + 1) - 1.
 							counter := counter - 1 ] ].
+
+			[ clues gridAxis filledIntervals flattened
+				detect: [ :index | endToBeginInterval noneSatisfy: [ :int | int includes: index ] ]
+				ifFound: [ :index | 
+					| intervalToShift indexOfLastUpdatedInterval |
+					intervalToShift := endToBeginInterval detect: [ :interval | interval min > index ].
+					indexOfLastUpdatedInterval := endToBeginInterval indexOf: intervalToShift.
+					endToBeginInterval at: indexOfLastUpdatedInterval put: intervalToShift - (intervalToShift min - index).
+					[ indexOfLastUpdatedInterval = 1 ]
+						whileFalse: [ (endToBeginInterval at: indexOfLastUpdatedInterval - 1) max < intervalToShift min
+								ifTrue: [ indexOfLastUpdatedInterval := 1 ]
+								ifFalse: [ 1halt. "endToBeginInterval at: indexOfLastUpdatedInterval - 1 put: (endToBeginInterval at: indexOfLastUpdatedInterval - 1) - (endToBeginInterval at: indexOfLastUpdatedInterval)   ."
+									indexOfLastUpdatedInterval := indexOfLastUpdatedInterval - 1 ] ].
+					true ]
+				ifNone: [ false ] ] whileTrue.
 
 			counter := 1.
 			beginToEndInterval
