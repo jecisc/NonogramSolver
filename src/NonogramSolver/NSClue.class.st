@@ -42,25 +42,38 @@ NSClue >> axis: anObject [
 	axis := anObject
 ]
 
-{ #category : #accessing }
-NSClue >> banFromPossibleInterval: anInterval [
-	"Remove the interval as parameter from the possible interval."
+{ #category : #'as yet unclassified' }
+NSClue >> ban: anInterval fromPossibleInterval: possibleInterval [
+	"Cut part of all the possible interval in parameter to not include the other interval in parameter."
 
+	"In all cases, we need to remove the current interval from the possible intervals."
+
+	self possibleIntervals remove: possibleInterval.
+
+	"If we need to ban the full interval, no need to add anything back to the list of possible intervals."
+	(anInterval includesAll: possibleInterval) ifTrue: [ ^ self ].
+	((possibleInterval includes: anInterval min) and: [ possibleInterval includes: anInterval max ])
+		ifTrue: [ "In that case we need to split the interval."
+			self addPossibleInterval: (possibleInterval min to: anInterval min - 1).
+			self addPossibleInterval: (anInterval max + 1 to: possibleInterval max) ]
+		ifFalse: [ 1 halt ]
+]
+
+{ #category : #accessing }
+NSClue >> banFromPossibleIntervals: anInterval [
+	"Remove the interval as parameter from the possible intervals."
+
+	| intervalsToUpdate |
 	self isSolved ifTrue: [ ^ self ].
 
 	"If the possible interval does not includes the interval in parameter, we do nothing."
 	(self canIncludeAny: anInterval) ifFalse: [ ^ self ].
 
-	(anInterval min > self deprecatedPossibleInterval min and: [ anInterval max < self deprecatedPossibleInterval max ])
-		ifTrue: [ self flag: #todo. "The interval should not be included inside the possible interval. This would split the possible interval in two. Maybe later I could manage possible intervalS but not now." ^ self ].
-
-	(anInterval min < self deprecatedPossibleInterval min and: [ anInterval max > self deprecatedPossibleInterval max ])
+	(anInterval min < self possibleInterval min and: [ anInterval max > self possibleInterval max ])
 		ifTrue: [ self error: 'The interval should not include the possible interval, else this mean the clue has no solution.' ].
-
-	"Remove all elements found in the interval and recast the collection as an interval."
-	self deprecatedPossibleInterval: self deprecatedPossibleInterval asOrderedCollection.
-	self deprecatedPossibleInterval removeAllFoundIn: anInterval.
-	self deprecatedPossibleInterval: (self deprecatedPossibleInterval min to: self deprecatedPossibleInterval max).
+		
+	intervalsToUpdate := self possibleIntervals select: [ :interval | interval includesAny: anInterval ].
+	intervalsToUpdate do: [ :interval | self ban: anInterval fromPossibleInterval: interval ].
 
 	self checkIsSolved
 ]
@@ -88,12 +101,12 @@ NSClue >> check [
 { #category : #checking }
 NSClue >> checkIsSolved [
 	isSolved ifTrue: [ ^ true ].
-	
-	self deprecatedPossibleInterval size = value ifFalse: [ ^ false ].
+
+	self possibleInterval size = value ifFalse: [ ^ false ].
 	
 	"If the clue is not solved but the possible interval is of the size of the value, we can mark it as solved and ensure the grid is filled."
 	self solved.
-	self deprecatedPossibleInterval do: [ :intervalIndex | self axis inGridAt: intervalIndex put: NSFilledState ].
+	self possibleInterval do: [ :intervalIndex | self axis inGridAt: intervalIndex put: NSFilledState ].
 		
 	^ true
 ]
@@ -182,10 +195,13 @@ NSClue >> printOn: aStream [
 ]
 
 { #category : #accessing }
-NSClue >> restrainPossibleIntervalWith: anInterval [ 
+NSClue >> restrainPossibleIntervalsWith: anInterval [ 
+	| intervalsToUpdate |
 	self isSolved ifTrue: [ ^ self ].
 
-	self deprecatedPossibleInterval: (((self deprecatedPossibleInterval min) max: anInterval min) to: ((self deprecatedPossibleInterval max) min: anInterval max)).
+	intervalsToUpdate := self possibleIntervals reject: [ :int | anInterval includesAll: anInterval ].
+	intervalsToUpdate do: [ :interval | 1halt. 	].
+	"self deprecatedPossibleInterval: (((self deprecatedPossibleInterval min) max: anInterval min) to: ((self deprecatedPossibleInterval max) min: anInterval max))."
 	self checkIsSolved
 ]
 
