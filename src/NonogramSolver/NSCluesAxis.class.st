@@ -65,6 +65,7 @@ NSCluesAxis >> check [
 	self checkIfFilledIntervalAreEntirelyInClues.
 	self checkIfFilledIntervalsAreBiggerThanClueValue.
 	self checkAllFilledIntervalsOfTheSizeOfTheirMatchingCluesAreSurroundedByEmptyCases.
+	self checkIfClueContainsAFillIntervalOfItsSizeThatSurroundingsAreNotInPossibleIntervals.
 	clues do: #check.
 	self checkIfAllCluesAreSolvedThatTheAxeIsResolved
 ]
@@ -96,6 +97,16 @@ NSCluesAxis >> checkIfAxisIsFullyFilled [
 
 	"If all filled interval matches the clues, then the line is full and we can ensure the clues are updated."
 	filledIntervals doWithIndex: [ :interval :index | (self at: index) restrainTo: interval ]
+]
+
+{ #category : #checking }
+NSCluesAxis >> checkIfClueContainsAFillIntervalOfItsSizeThatSurroundingsAreNotInPossibleIntervals [
+	self gridAxis filledIntervals
+		do: [ :filledInterval | 
+			(self unresolvedClues select: [ :clue | clue value = filledInterval size and: [ clue canIncludeAll: filledInterval ] ])
+				do: [ :clue | 
+					filledInterval min > 1 ifTrue: [ clue ban: (filledInterval min - 1 to: filledInterval min - 1) ].
+					filledInterval max < self axisSize ifTrue: [ clue ban: (filledInterval max + 1 to: filledInterval max + 1) ] ] ]
 ]
 
 { #category : #checking }
@@ -142,16 +153,17 @@ NSCluesAxis >> checkPossibleIntervalsCanBeShortenWithEmptyCases [
 		ifNotEmpty: [ :emptyIndexes | 
 			self unresolvedClues
 				do: [ :clue | 
-					emptyIndexes do: [ :index | 
-						clue possibleIntervals
-							select: [ :interval | interval includes: index ]
-							thenDo: [ :interval |
-								| intervalToConsider |
-								intervalToConsider := interval min to: index.
-								intervalToConsider size <= clue value ifTrue: [ clue ban: intervalToConsider ].
+					emptyIndexes
+						do: [ :index | 
+							"Do not use #select:thenDo: because we remove elements from the collection of possible intervals if we do that."
+							(clue possibleIntervals select: [ :interval | interval includes: index ])
+								do: [ :interval | 
+									| intervalToConsider |
+									intervalToConsider := interval min to: index.
+									intervalToConsider size <= clue value ifTrue: [ clue ban: intervalToConsider ].
 
-								intervalToConsider := index to: interval max.
-								intervalToConsider size <= clue value ifTrue: [ clue ban: intervalToConsider ] ] ] ] ]
+									intervalToConsider := index to: interval max.
+									intervalToConsider size <= clue value ifTrue: [ clue ban: intervalToConsider ] ] ] ] ]
 ]
 
 { #category : #checking }
