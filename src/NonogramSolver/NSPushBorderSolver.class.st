@@ -22,22 +22,25 @@ NSPushBorderSolver >> resolve [
 		"
 			clues unresolvedClues
 				do: [ :clue | 
-					(((clue deprecatedPossibleInterval min - clue value max: 0) to: (clue deprecatedPossibleInterval min - 1 max: 0))
+					| possibleInterval |
+					possibleInterval := clue possibleIntervals first.
+					(((possibleInterval min - clue value max: 0) to: (possibleInterval min - 1 max: 0))
 						select: [ :index | index = 0 or: [ (clues inGridAt: index) isEmpty ] ])
 						ifNotEmpty: [ :emptyCases | 
 							| indexOfCloseEmptyCase |
 							indexOfCloseEmptyCase := emptyCases max.
-							clue deprecatedPossibleInterval
+							possibleInterval
 								detect: [ :index | (clues select: [ :c | c canInclude: index ]) size = 1 and: [ (clues inGridAt: index) isFilled ] ]
 								ifFound:
 									[ :indexOfFirstFilledCaseSpecificToClue | indexOfFirstFilledCaseSpecificToClue + 1 to: indexOfCloseEmptyCase + clue value do: [ :index | clues inGridAt: index put: NSFilledState ] ] ].
 
-					(((clue deprecatedPossibleInterval max + clue value min: axisSize + 1) to: (clue deprecatedPossibleInterval max + 1 min: axisSize + 1))
+					possibleInterval := clue possibleIntervals last.
+					(((possibleInterval max + clue value min: axisSize + 1) to: (possibleInterval max + 1 min: axisSize + 1))
 						select: [ :index | index = (axisSize + 1) or: [ (clues inGridAt: index) isEmpty ] ])
 						ifNotEmpty: [ :emptyCases | 
 							| indexOfCloseEmptyCase |
 							indexOfCloseEmptyCase := emptyCases min.
-							clue deprecatedPossibleInterval reversed
+							possibleInterval reversed
 								detect: [ :index | (clues select: [ :c | c canInclude: index ]) size = 1 and: [ (clues inGridAt: index) isFilled ] ]
 								ifFound:
 									[ :indexOfFirstFilledCaseSpecificToClue | indexOfCloseEmptyCase - clue value to: indexOfFirstFilledCaseSpecificToClue - 1 do: [ :index | clues inGridAt: index put: NSFilledState ] ] ] ] ]
