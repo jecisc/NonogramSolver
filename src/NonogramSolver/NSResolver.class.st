@@ -12,7 +12,8 @@ Class {
 
 { #category : #'class initialization' }
 NSResolver class >> initialize [
-	self initializeLogger
+	self initializeLogger.
+	self launchWebSocket
 ]
 
 { #category : #'class initialization' }
@@ -27,6 +28,21 @@ NSResolver class >> initializeLogger [
 				print24: true
 				on: aStream
 			]
+]
+
+{ #category : #'class initialization' }
+NSResolver class >> launchWebSocket [
+	<script>
+	self flag: #todo. "make port configurable + restart on primitive failure (check Telescope Cytoscape)"
+	ZnServer stopDefault.
+	ZnServer startDefaultOn: 1802.
+	ZnServer default
+		delegate:
+			(ZnWebSocketDelegate
+				handler: [ :webSocket | 
+					[ webSocket runWith: [ :message | webSocket sendMessage: (self on: message) ] ]
+						on: ConnectionClosed , PrimitiveFailed
+						do: [  ] ])
 ]
 
 { #category : #'instance creation' }
