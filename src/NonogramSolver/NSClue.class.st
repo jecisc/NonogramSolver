@@ -58,9 +58,8 @@ NSClue >> banFromPossibleInterval: anInterval [
 		ifTrue: [ self error: 'The interval should not include the possible interval, else this mean the clue has no solution.' ].
 
 	"Remove all elements found in the interval and recast the collection as an interval."
-	self deprecatedPossibleInterval: self deprecatedPossibleInterval asOrderedCollection.
-	self deprecatedPossibleInterval removeAllFoundIn: anInterval.
-	self deprecatedPossibleInterval: (self deprecatedPossibleInterval min to: self deprecatedPossibleInterval max).
+	self deprecatedPossibleInterval asOrderedCollection removeAllFoundIn: anInterval; in: [:i | 
+	self deprecatedPossibleInterval: (i min to: i max)].
 
 	self checkIsSolved
 ]
