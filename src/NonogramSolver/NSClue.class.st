@@ -62,6 +62,7 @@ NSClue >> ban: anInterval [
 				ifFalse: [ intervalToUpdate min + value <= anInterval min ifTrue: [ self addPossibleInterval: (intervalToUpdate min to: anInterval min - 1) ].
 					intervalToUpdate max - value >= anInterval max ifTrue: [ self addPossibleInterval: (anInterval max + 1 to: intervalToUpdate max) ] ] ].
 
+	self assert: self possibleIntervals isNotEmpty.
 	self checkIsSolved
 ]
 
@@ -182,6 +183,7 @@ NSClue >> restrainTo: anInterval [
 					newInterval := (intervalToUpdate min max: anInterval min) to: (intervalToUpdate max min: anInterval max).
 					newInterval size >= value ifTrue: [ self addPossibleInterval: newInterval ] ] ].
 
+	self assert: self possibleIntervals isNotEmpty.
 	self checkIsSolved
 ]
 
