@@ -2,7 +2,8 @@ Class {
 	#name : #NSOverlapSolver,
 	#superclass : #NSAbstractSolver,
 	#instVars : [
-		'counter'
+		'counter',
+		'direction'
 	],
 	#category : #NonogramSolver
 }
@@ -14,10 +15,12 @@ NSOverlapSolver class >> priority [
 
 { #category : #resolving }
 NSOverlapSolver >> resolve [
+	resolver check.
 	self
 		withUnfinishedAxisDo: [ :clues :axisSize | 
 			| endToBeginInterval beginToEndInterval |
 			counter := 1.
+			direction := NSDirectOverlapDirection.
 			beginToEndInterval := clues
 				collectWithIndex: [ :clue :index | 
 					| interval |
@@ -27,15 +30,16 @@ NSOverlapSolver >> resolve [
 						clueValue: clue value
 						forClues: clues
 						shiftFurther: true.
-					counter := counter + clue value + 1.
+					counter := self shift: counter by: clue value + 1.
 					"If the interval is followed by filled cases, then we can move it to embded it."
-					[ counter - 1 <= axisSize and: [ (clues inGridAt: counter - 1) isFilled ] ]
+					[ counter - 1 <= axisSize and: [ (clues inGridAt: (self shift: counter by: -1)) isFilled ] ]
 						whileTrue: [ interval := interval + 1.
-							counter := counter + 1 ].
+							counter := self shift: counter by: 1 ].
 					interval ].
 
 
 			counter := axisSize.
+			direction := NSInverstedOverlapDirection.
 			endToBeginInterval := (clues reverse
 				collectWithIndex: [ :clue :index | 
 					| interval |
@@ -45,11 +49,10 @@ NSOverlapSolver >> resolve [
 						clueValue: clue value
 						forClues: clues
 						shiftFurther: false.
-					counter := counter - (clue value + 1).
-					"If the interval is followed by filled cases, then we can move it to embded it."
-					[ counter + 1 > 0 and: [ (clues inGridAt: counter + 1) isFilled ] ]
+					counter := self shift: counter by: clue value + 1.
+					[ "If the interval is followed by filled cases, then we can move it to embded it." counter + 1 > 0 and: [ (clues inGridAt: (self shift: counter by: -1)) isFilled ] ]
 						whileTrue: [ interval := interval - 1.
-							counter := counter - 1 ].
+							counter := self shift: counter by: 1 ].
 					interval ]) reversed.
 
 			"			
@@ -97,6 +100,11 @@ NSOverlapSolver >> resolve [
 					counter := counter + 1 ] ]
 ]
 
+{ #category : #'as yet unclassified' }
+NSOverlapSolver >> shift: anIntegerOrInterval by: anInteger [
+	^ direction shift: anIntegerOrInterval by: anInteger
+]
+
 { #category : #resolving }
 NSOverlapSolver >> tryToShiftInterval: possibleInterval clueValue: clueValue forClues: clues shiftFurther: aBoolean [
 	| initialInterval shiftedInterval |
@@ -107,7 +115,7 @@ NSOverlapSolver >> tryToShiftInterval: possibleInterval clueValue: clueValue for
 		clueValue: clueValue
 		forClues: clues
 		shiftFurther: aBoolean.
-	initialInterval = shiftedInterval ] whileFalse: [ initialInterval := shiftedInterval ].	"As long as we can shift, we try to shift once again."
+	initialInterval = shiftedInterval ] whileFalse: [ "1halt." initialInterval := shiftedInterval ].	"As long as we can shift, we try to shift once again."
 	^ shiftedInterval
 ]
 
@@ -121,11 +129,7 @@ NSOverlapSolver >> tryToShiftOnceInterval: possibleInterval clueValue: clueValue
 			shift := aBoolean
 				ifTrue: [ emptyCases max - interval min + 1 ]
 				ifFalse: [ interval max - emptyCases min + 1 ].
-			counter := aBoolean
-				ifTrue: [ counter + shift ]
-				ifFalse: [ counter - shift ].
-			interval := aBoolean
-				ifTrue: [ interval + shift ]
-				ifFalse: [ interval - shift ] ].
+			counter := self shift: counter by: shift.
+			interval := self shift: interval by: shift ].
 	^ interval
 ]
