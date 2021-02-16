@@ -58,8 +58,8 @@ NSCluesAxis >> banIntervalOf: aNSClue [
 NSCluesAxis >> check [
 	self isResolved ifTrue: [ ^ self ].
 
-	self checkIfAxisIsFullyFilled.
 	self checkIfFilledIntervalCanFinishAClue.
+	self checkIfAxisIsFullyFilled.
 	self checkRemoveEmptyCasesFromPossibleIntervals.
 	self checkPossibleIntervalsCanBeShortenWithFilledCasesBelongingToOnlyOneClue.
 	self checkIfFilledIntervalAreEntirelyInClues.
@@ -121,9 +121,11 @@ NSCluesAxis >> checkIfFilledIntervalAreEntirelyInClues [
 NSCluesAxis >> checkIfFilledIntervalCanFinishAClue [
 	"If a filled interval matches only one clue and is the same size as this clue, then we can resolve the clue."
 
-	| possibleCluesForFilledIntervals |
-	possibleCluesForFilledIntervals := (self gridAxis filledIntervals collect: [ :interval | interval -> (self possibleCluesForFilledInterval: interval) ]) asDictionary.
-	possibleCluesForFilledIntervals keysAndValuesDo: [ :interval :cls | (cls size = 1 and: [ cls anyOne value = interval size ]) ifTrue: [ cls anyOne restrainTo: interval ] ]
+	self gridAxis filledIntervals
+		do: [ :filledInterval | 
+			| matchingClues |
+			matchingClues := self unresolvedClues select: [ :clue | clue canIncludeAll: filledInterval ].
+			(matchingClues size = 1 and: [ matchingClues anyOne value = filledInterval size ]) ifTrue: [ matchingClues anyOne restrainTo: filledInterval ] ]
 ]
 
 { #category : #checking }
@@ -264,14 +266,6 @@ NSCluesAxis >> isResolved [
 { #category : #accessing }
 NSCluesAxis >> last [
 	^ clues last
-]
-
-{ #category : #accessing }
-NSCluesAxis >> possibleCluesForFilledInterval: interval [
-	"I return all the clues that can contain an interval of filled cases.
-	The interval cannot be bigger than the clue size and et needs to be included in the possible interval of the clue."
-
-	^ clues select: [ :clue | clue value >= interval size and: [ clue canIncludeAll: interval ] ]
 ]
 
 { #category : #printing }
