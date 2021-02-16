@@ -157,7 +157,7 @@ NSCluesAxis >> checkPossibleIntervalsCanBeShortenWithFilledCasesBelongingToOnlyO
 
 { #category : #checking }
 NSCluesAxis >> checkRemoveEmptyCasesFromPossibleIntervals [
-	"If the possible interval of a clue contains an empty case that does not allow to fit the clue before or after it, we can restrain the possible interval of the clue to exclude the beginning or the end."
+	"Remove all empty intervals from the possible intervals of clues."
 
 	self gridAxis emptyIntervals
 		ifNotEmpty: [ :emptyIntervals | self unresolvedClues do: [ :clue | emptyIntervals do: [ :emptyInterval | clue ban: emptyInterval ] ] ]
