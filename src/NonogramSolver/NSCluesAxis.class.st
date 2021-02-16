@@ -61,7 +61,7 @@ NSCluesAxis >> check [
 	self checkIfFilledIntervalCanFinishAClue.
 	self checkIfAxisIsFullyFilled.
 	self checkRemoveEmptyCasesFromPossibleIntervals.
-	self checkPossibleIntervalsCanBeShortenWithFilledCasesBelongingToOnlyOneClue.
+	self checkRestrainPossibleIntervalsIfFilledIntervalMatchesOnlyOneClue.
 	self checkIfFilledIntervalAreEntirelyInClues.
 	self checkIfFilledIntervalsAreBiggerThanClueValue.
 	self checkAllFilledIntervalsOfTheSizeOfTheirMatchingCluesAreSurroundedByEmptyCases.
@@ -148,21 +148,25 @@ NSCluesAxis >> checkIfFilledIntervalsAreBiggerThanClueValue [
 ]
 
 { #category : #checking }
-NSCluesAxis >> checkPossibleIntervalsCanBeShortenWithFilledCasesBelongingToOnlyOneClue [
-	self gridAxis filledIntervals flattened
-		select: [ :filledIndex | (self unresolvedClues select: [ :clue | clue canInclude: filledIndex ]) size = 1 ]
-		thenDo: [ :filledIndexAssociatedToOneClue | 
-			self unresolvedClues
-				detect: [ :clue | clue canInclude: filledIndexAssociatedToOneClue ]
-				ifFound: [ :clue | clue restrainTo: (filledIndexAssociatedToOneClue - clue value + 1 to: filledIndexAssociatedToOneClue + clue value - 1) ] ]
-]
-
-{ #category : #checking }
 NSCluesAxis >> checkRemoveEmptyCasesFromPossibleIntervals [
 	"Remove all empty intervals from the possible intervals of clues."
 
 	self gridAxis emptyIntervals
 		ifNotEmpty: [ :emptyIntervals | self unresolvedClues do: [ :clue | emptyIntervals do: [ :emptyInterval | clue ban: emptyInterval ] ] ]
+]
+
+{ #category : #checking }
+NSCluesAxis >> checkRestrainPossibleIntervalsIfFilledIntervalMatchesOnlyOneClue [
+	"If a filled interval is in a clue, then we can restrain the possibleIntervals of the clue to remove cases too far from this interval."
+
+	self gridAxis filledIntervals
+		do: [ :filledInterval | 
+			(self unresolvedClues select: [ :clue | clue canIncludeAll: filledInterval ])
+				ifNotEmpty: [ :matchingClues | 
+					matchingClues size = 1
+						ifTrue: [ | clue |
+							clue := matchingClues anyOne.
+							clue restrainTo: (filledInterval max - clue value + 1 to: filledInterval min + clue value - 1) ] ] ]
 ]
 
 { #category : #accessing }
