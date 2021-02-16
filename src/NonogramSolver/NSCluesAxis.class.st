@@ -62,8 +62,8 @@ NSCluesAxis >> check [
 	self checkIfAxisIsFullyFilled.
 	self checkRemoveEmptyCasesFromPossibleIntervals.
 	self checkIfFilledIntervalAreEntirelyInClues.
-	self checkRestrainPossibleIntervalsIfFilledIntervalMatchesOnlyOneClue.
 	self checkIfFilledIntervalsAreBiggerThanClueValue.
+	self checkRestrainPossibleIntervalsIfFilledIntervalMatchesOnlyOneClue.
 	self checkAllFilledIntervalsOfTheSizeOfTheirMatchingCluesAreSurroundedByEmptyCases.
 	self checkIfClueContainsAFillIntervalOfItsSizeThatSurroundingsAreNotInPossibleIntervals.
 	clues do: #check.
@@ -132,21 +132,12 @@ NSCluesAxis >> checkIfFilledIntervalCanFinishAClue [
 
 { #category : #checking }
 NSCluesAxis >> checkIfFilledIntervalsAreBiggerThanClueValue [
+	"If a filled interval is bigger than a matching clue, we can remove it and the cases surrounding it since we need at least one space between two intervals."
+
 	self gridAxis filledIntervals
 		do: [ :filledInterval | 
-			(self unresolvedClues select: [ :clue | clue canIncludeAny: filledInterval ])
-				ifNotEmpty: [ :matchingClues | 
-					matchingClues
-						do: [ :clue | 
-							clue value < filledInterval size
-								ifTrue: [ | intervalToBan |
-									"We can also remove what is before and after if they are at the limit."
-									intervalToBan := filledInterval.
-									(clue canInclude: filledInterval min - clue value - 1)
-										ifFalse: [ intervalToBan := (0 max: filledInterval min - clue value - 1) to: intervalToBan max ].
-									(clue canInclude: filledInterval max + clue value + 1)
-										ifFalse: [ intervalToBan := intervalToBan min to: (self axisSize min: filledInterval max + clue value + 1) ].
-									clue ban: intervalToBan ] ] ] ]
+			(self unresolvedClues select: [ :clue | (clue canIncludeAny: filledInterval) and: [ clue value < filledInterval size ] ])
+				ifNotEmpty: [ :matchingClues | matchingClues do: [ :clue | clue ban: (filledInterval min - 1 to: filledInterval max + 1) ] ] ]
 ]
 
 { #category : #checking }
