@@ -60,7 +60,7 @@ NSCluesAxis >> check [
 
 	self checkIfAxisIsFullyFilled.
 	self checkIfFilledIntervalCanFinishAClue.
-	self checkPossibleIntervalsCanBeShortenWithEmptyCases.
+	self checkRemoveEmptyCasesFromPossibleIntervals.
 	self checkPossibleIntervalsCanBeShortenWithFilledCasesBelongingToOnlyOneClue.
 	self checkIfFilledIntervalAreEntirelyInClues.
 	self checkIfFilledIntervalsAreBiggerThanClueValue.
@@ -146,27 +146,6 @@ NSCluesAxis >> checkIfFilledIntervalsAreBiggerThanClueValue [
 ]
 
 { #category : #checking }
-NSCluesAxis >> checkPossibleIntervalsCanBeShortenWithEmptyCases [
-	"If the possible interval of a clue contains an empty case that does not allow to fit the clue before or after it, we can restrain the possible interval of the clue to exclude the beginning or the end."
-
-	self gridAxis emptyIntervals flattened
-		ifNotEmpty: [ :emptyIndexes | 
-			self unresolvedClues
-				do: [ :clue | 
-					emptyIndexes
-						do: [ :index | 
-							"Do not use #select:thenDo: because we remove elements from the collection of possible intervals if we do that."
-							(clue possibleIntervals select: [ :interval | interval includes: index ])
-								do: [ :interval | 
-									| intervalToConsider |
-									intervalToConsider := interval min to: index.
-									intervalToConsider size <= clue value ifTrue: [ clue ban: intervalToConsider ].
-
-									intervalToConsider := index to: interval max.
-									intervalToConsider size <= clue value ifTrue: [ clue ban: intervalToConsider ] ] ] ] ]
-]
-
-{ #category : #checking }
 NSCluesAxis >> checkPossibleIntervalsCanBeShortenWithFilledCasesBelongingToOnlyOneClue [
 	self gridAxis filledIntervals flattened
 		select: [ :filledIndex | (self unresolvedClues select: [ :clue | clue canInclude: filledIndex ]) size = 1 ]
@@ -174,6 +153,14 @@ NSCluesAxis >> checkPossibleIntervalsCanBeShortenWithFilledCasesBelongingToOnlyO
 			self unresolvedClues
 				detect: [ :clue | clue canInclude: filledIndexAssociatedToOneClue ]
 				ifFound: [ :clue | clue restrainTo: (filledIndexAssociatedToOneClue - clue value + 1 to: filledIndexAssociatedToOneClue + clue value - 1) ] ]
+]
+
+{ #category : #checking }
+NSCluesAxis >> checkRemoveEmptyCasesFromPossibleIntervals [
+	"If the possible interval of a clue contains an empty case that does not allow to fit the clue before or after it, we can restrain the possible interval of the clue to exclude the beginning or the end."
+
+	self gridAxis emptyIntervals
+		ifNotEmpty: [ :emptyIntervals | self unresolvedClues do: [ :clue | emptyIntervals do: [ :emptyInterval | clue ban: emptyInterval ] ] ]
 ]
 
 { #category : #accessing }
