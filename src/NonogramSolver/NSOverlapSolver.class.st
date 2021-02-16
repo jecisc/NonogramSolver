@@ -21,12 +21,8 @@ NSOverlapSolver >> resolve [
 			beginToEndInterval := clues
 				collectWithIndex: [ :clue :index | 
 					| interval |
-					(clue canInclude: counter) ifFalse: [ counter := clue possibleIntervals first min ].
-					interval := self
-						tryToShiftInterval: (counter to: counter + clue value - 1)
-						clueValue: clue value
-						forClues: clues
-						shiftFurther: true.
+					(clue canIncludeAll: (counter to: counter + clue value - 1)) ifFalse: [ counter := (clue possibleIntervals detect: [ :int | int min >= counter ]) min ].
+					interval := counter to: counter + clue value - 1.
 					counter := counter + clue value + 1.
 					"If the interval is followed by filled cases, then we can move it to embded it."
 					[ counter - 1 <= axisSize and: [ (clues inGridAt: counter - 1) isFilled ] ]
@@ -39,12 +35,9 @@ NSOverlapSolver >> resolve [
 			endToBeginInterval := (clues reverse
 				collectWithIndex: [ :clue :index | 
 					| interval |
-					(clue canInclude: counter) ifFalse: [ counter := clue possibleIntervals last max ].
-					interval := self
-						tryToShiftInterval: (counter - (clue value - 1) to: counter)
-						clueValue: clue value
-						forClues: clues
-						shiftFurther: false.
+					(clue canIncludeAll: (counter - (clue value - 1) to: counter))
+						ifFalse: [ counter := (clue possibleIntervals reversed detect: [ :int | int max <= counter ]) max ].
+					interval := counter - (clue value - 1) to: counter.
 					counter := counter - (clue value + 1).
 					"If the interval is followed by filled cases, then we can move it to embded it."
 					[ counter + 1 > 0 and: [ (clues inGridAt: counter + 1) isFilled ] ]
@@ -95,37 +88,4 @@ NSOverlapSolver >> resolve [
 					(clues at: counter) restrainTo: (int1 min to: int2 max).
 					(int1 intersection: int2) do: [ :index | clues inGridAt: index put: NSFilledState ].
 					counter := counter + 1 ] ]
-]
-
-{ #category : #resolving }
-NSOverlapSolver >> tryToShiftInterval: possibleInterval clueValue: clueValue forClues: clues shiftFurther: aBoolean [
-	| initialInterval shiftedInterval |
-	initialInterval := possibleInterval.
-	self flag: #todo. "This might not be needed anymore since we start at the beginning of the possible interval of the clue and the check probably remove the empty cases from the possible interval if it's close to a border."
-	[ shiftedInterval := self
-		tryToShiftOnceInterval: initialInterval
-		clueValue: clueValue
-		forClues: clues
-		shiftFurther: aBoolean.
-	initialInterval = shiftedInterval ] whileFalse: [ initialInterval := shiftedInterval ].	"As long as we can shift, we try to shift once again."
-	^ shiftedInterval
-]
-
-{ #category : #resolving }
-NSOverlapSolver >> tryToShiftOnceInterval: possibleInterval clueValue: clueValue forClues: clues shiftFurther: aBoolean [
-	| interval |
-	interval := possibleInterval.
-	(interval select: [ :i | (clues inGridAt: i) isEmpty ])
-		ifNotEmpty: [ :emptyCases | 
-			| shift |
-			shift := aBoolean
-				ifTrue: [ emptyCases max - interval min + 1 ]
-				ifFalse: [ interval max - emptyCases min + 1 ].
-			counter := aBoolean
-				ifTrue: [ counter + shift ]
-				ifFalse: [ counter - shift ].
-			interval := aBoolean
-				ifTrue: [ interval + shift ]
-				ifFalse: [ interval - shift ] ].
-	^ interval
 ]
