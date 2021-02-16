@@ -16,9 +16,9 @@ NSOverlapSolver class >> priority [
 NSOverlapSolver >> resolve [
 	self
 		withUnfinishedAxisDo: [ :clues :axisSize | 
-			| endToBeginInterval beginToEndInterval |
+			| invertedIntervals directIntervals |
 			counter := 1.
-			beginToEndInterval := clues
+			directIntervals := clues
 				collectWithIndex: [ :clue :index | 
 					| interval |
 					interval := counter to: counter + clue value - 1.
@@ -28,35 +28,26 @@ NSOverlapSolver >> resolve [
 					counter := interval max + 2.
 					interval ].
 
-			[ clues gridAxis filledIntervals reversed
-				detect: [ :filledInterval | beginToEndInterval noneSatisfy: [ :int | int includesAll: filledInterval ] ]
+			"[ "clues gridAxis filledIntervals reversed
+				detect: [ :filledInterval | directIntervals noneSatisfy: [ :int | int includesAll: filledInterval ] ]
 				ifFound: [ :filledInterval | 
-					| intervalToShift indexOfIntervalToShift |
-					intervalToShift := beginToEndInterval reversed detect: [ :interval | interval max < filledInterval min and: [ interval size >= filledInterval size ] ].
-					indexOfIntervalToShift := beginToEndInterval indexOf: intervalToShift.
-					beginToEndInterval at: indexOfIntervalToShift put: (intervalToShift + (filledInterval max - intervalToShift max)).
-					"self assert: indexOfIntervalToShift = beginToEndInterval size description: 'If we have case it is not true, we need to shift the following intervals.'."
-					
-					
-					
-					
-					"| intervalToShift indexOfLastUpdatedInterval |
-					intervalToShift := beginToEndInterval reverse detect: [ :interval | interval max < filledInterval ].
-					indexOfLastUpdatedInterval := beginToEndInterval indexOf: intervalToShift.
-					beginToEndInterval at: indexOfLastUpdatedInterval put: intervalToShift + (filledInterval - intervalToShift max).
-					[ indexOfLastUpdatedInterval = beginToEndInterval size ]
-						whileFalse: [ (beginToEndInterval at: indexOfLastUpdatedInterval + 1) min > (beginToEndInterval at: indexOfLastUpdatedInterval) max
-								ifTrue: [ indexOfLastUpdatedInterval := beginToEndInterval size ]
-								ifFalse: [ | previousIntervalToShift |
-									previousIntervalToShift := beginToEndInterval at: indexOfLastUpdatedInterval.
-									indexOfLastUpdatedInterval := indexOfLastUpdatedInterval + 1.
-									intervalToShift := beginToEndInterval at: indexOfLastUpdatedInterval.
-									beginToEndInterval at: indexOfLastUpdatedInterval put: intervalToShift + (previousIntervalToShift max - intervalToShift min + 1) ] ]."
-					"true" false ]
-				ifNone: [ false ] ] whileTrue.
+					| intervalToShift currentIndex |
+					intervalToShift := directIntervals reversed detect: [ :interval | interval max < filledInterval min and: [ interval size >= filledInterval size ] ].
+					currentIndex := directIntervals indexOf: intervalToShift.
+					directIntervals at: currentIndex put: intervalToShift + (filledInterval max - intervalToShift max).
+					[ currentIndex < directIntervals size ]
+						whileTrue: [ | currentInterval nextInterval |
+							currentInterval := directIntervals at: currentIndex.
+							nextInterval := directIntervals at: currentIndex + 1.
+							currentIndex := currentInterval max + 1 < nextInterval min
+								ifTrue: [ directIntervals size ]
+								ifFalse: [ directIntervals at: currentIndex + 1 put: nextInterval + currentInterval max - nextInterval min + 2.
+									currentIndex + 1 ] ].
+					true ]
+				ifNone: [ false ]" ] whileTrue".
 
 			counter := axisSize.
-			endToBeginInterval := (clues reverse
+			invertedIntervals := (clues reverse
 				collectWithIndex: [ :clue :index | 
 					| interval |
 					interval := counter - (clue value - 1) to: counter.
@@ -67,26 +58,27 @@ NSOverlapSolver >> resolve [
 					counter := interval min - 2.
 					interval ]) reversed.
 
-
-
-			"[ clues gridAxis filledIntervals flattened
-				detect: [ :index | endToBeginInterval noneSatisfy: [ :int | int includes: index ] ]
-				ifFound: [ :index | 
-					| intervalToShift indexOfLastUpdatedInterval |
-					intervalToShift := endToBeginInterval detect: [ :interval | interval min > index ].
-					indexOfLastUpdatedInterval := endToBeginInterval indexOf: intervalToShift.
-					endToBeginInterval at: indexOfLastUpdatedInterval put: intervalToShift - (intervalToShift min - index).
-					[ indexOfLastUpdatedInterval = 1 ]
-						whileFalse: [ (endToBeginInterval at: indexOfLastUpdatedInterval - 1) max < intervalToShift min
-								ifTrue: [ indexOfLastUpdatedInterval := 1 ]
-								ifFalse: [ 1halt. 
-									indexOfLastUpdatedInterval := indexOfLastUpdatedInterval - 1 ] ].
+			"[" clues gridAxis filledIntervals
+				detect: [ :filledInterval | invertedIntervals noneSatisfy: [ :int | int includesAll: filledInterval ] ]
+				ifFound: [ :filledInterval | 
+					| intervalToShift currentIndex |
+					intervalToShift := invertedIntervals detect: [ :interval | interval min > filledInterval max and: [ interval size >= filledInterval size ] ].
+					currentIndex := invertedIntervals indexOf: intervalToShift.
+					invertedIntervals at: currentIndex put: intervalToShift - (intervalToShift min - filledInterval min).
+					[ currentIndex > 1 ]
+						whileTrue: [ | currentInterval nextInterval |
+							currentInterval := invertedIntervals at: currentIndex.
+							nextInterval := invertedIntervals at: currentIndex - 1.
+							currentIndex := nextInterval max < (currentInterval min - 1)
+								ifTrue: [ 1 ]
+								ifFalse: [ invertedIntervals at: currentIndex - 1 put: nextInterval - (nextInterval max - currentInterval min + 2).
+									currentIndex - 1 ] ].
 					true ]
-				ifNone: [ false ] ] whileTrue."
+				ifNone: [ false ] "] whileTrue".
 
 			counter := 1.
-			beginToEndInterval
-				with: endToBeginInterval
+			directIntervals
+				with: invertedIntervals
 				do: [ :int1 :int2 | 
 					(clues at: counter) restrainTo: (int1 min to: int2 max).
 					(int1 intersection: int2) do: [ :index | clues inGridAt: index put: NSFilledState ].
