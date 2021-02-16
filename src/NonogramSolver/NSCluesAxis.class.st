@@ -61,8 +61,8 @@ NSCluesAxis >> check [
 	self checkIfFilledIntervalCanFinishAClue.
 	self checkIfAxisIsFullyFilled.
 	self checkRemoveEmptyCasesFromPossibleIntervals.
-	self checkRestrainPossibleIntervalsIfFilledIntervalMatchesOnlyOneClue.
 	self checkIfFilledIntervalAreEntirelyInClues.
+	self checkRestrainPossibleIntervalsIfFilledIntervalMatchesOnlyOneClue.
 	self checkIfFilledIntervalsAreBiggerThanClueValue.
 	self checkAllFilledIntervalsOfTheSizeOfTheirMatchingCluesAreSurroundedByEmptyCases.
 	self checkIfClueContainsAFillIntervalOfItsSizeThatSurroundingsAreNotInPossibleIntervals.
@@ -111,10 +111,12 @@ NSCluesAxis >> checkIfClueContainsAFillIntervalOfItsSizeThatSurroundingsAreNotIn
 
 { #category : #checking }
 NSCluesAxis >> checkIfFilledIntervalAreEntirelyInClues [
+	"If a filled interval is only partly in a clue, we can remove it and the cases surrounding it since we need at least one space between two intervals."
+
 	self gridAxis filledIntervals
 		do: [ :filledInterval | 
 			(self unresolvedClues select: [ :clue | (clue canIncludeAny: filledInterval) and: [ (clue canIncludeAll: filledInterval) not ] ])
-				ifNotEmpty: [ :matchingClues | matchingClues do: [ :clue | clue ban: filledInterval ] ] ]
+				ifNotEmpty: [ :matchingClues | matchingClues do: [ :clue | clue ban: (filledInterval min - 1 to: filledInterval max + 1) ] ] ]
 ]
 
 { #category : #checking }
@@ -157,11 +159,14 @@ NSCluesAxis >> checkRemoveEmptyCasesFromPossibleIntervals [
 
 { #category : #checking }
 NSCluesAxis >> checkRestrainPossibleIntervalsIfFilledIntervalMatchesOnlyOneClue [
-	"If a filled interval is in a clue, then we can restrain the possibleIntervals of the clue to remove cases too far from this interval."
+	"If a filled interval is in a clue, then we can restrain the possibleIntervals of the clue to remove cases too far from this interval.
+	
+	Implementation detail:
+		we can use #canIncludeAny: instead of #canIncludeAll: because this check is called after #checkIfFilledIntervalAreEntirelyInClues"
 
 	self gridAxis filledIntervals
 		do: [ :filledInterval | 
-			(self unresolvedClues select: [ :clue | clue canIncludeAll: filledInterval ])
+			(self unresolvedClues select: [ :clue | clue canIncludeAny: filledInterval ])
 				ifNotEmpty: [ :matchingClues | 
 					matchingClues size = 1
 						ifTrue: [ | clue |
