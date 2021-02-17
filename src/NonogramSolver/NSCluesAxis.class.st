@@ -66,6 +66,7 @@ NSCluesAxis >> check [
 	self checkRestrainPossibleIntervalsIfFilledIntervalMatchesOnlyOneClue.
 	self checkAllFilledIntervalsOfTheSizeOfTheirMatchingCluesAreSurroundedByEmptyCases.
 	self checkIfClueContainsAFillIntervalOfItsSizeThatSurroundingsAreNotInPossibleIntervals.
+	self checkIfFilledIntervalCloseToEmptyCasesCanBeExpandedToTheSizeOfTheSmallestMatchingClue.
 	clues do: #check.
 	self checkIfAllCluesAreSolvedThatTheAxeIsResolved
 ]
@@ -128,6 +129,31 @@ NSCluesAxis >> checkIfFilledIntervalCanFinishAClue [
 			| matchingClues |
 			matchingClues := self unresolvedClues select: [ :clue | clue canIncludeAll: filledInterval ].
 			(matchingClues size = 1 and: [ matchingClues anyOne value = filledInterval size ]) ifTrue: [ matchingClues anyOne restrainTo: filledInterval ] ]
+]
+
+{ #category : #checking }
+NSCluesAxis >> checkIfFilledIntervalCloseToEmptyCasesCanBeExpandedToTheSizeOfTheSmallestMatchingClue [
+	"For example if we have:
+	| | |x|x| | |o|o|o| | | | | | |
+	And the filled interval can be associated to a clue of size 7 and another of size 9, then we can fill like this:
+	| | |x|x| | |o|o|o|o|o| | | | |"
+
+	| axis emptyIntervals |
+	axis := self gridAxis.
+	emptyIntervals := axis emptyIntervals.
+	axis filledIntervals
+		do: [ :filledInterval | 
+			(self unresolvedClues select: [ :clue | clue canIncludeAll: filledInterval ])
+				ifNotEmpty: [ :matchingClues | 
+					| minSizeOfTheFilledInterval |
+					minSizeOfTheFilledInterval := (matchingClues collect: #value) min.
+					emptyIntervals
+						detect: [ :interval | interval includesAny: (filledInterval max to: filledInterval min + minSizeOfTheFilledInterval) ]
+						ifFound: [ :emptyInterval | (emptyInterval min - minSizeOfTheFilledInterval to: filledInterval min - 1) do: [ :index | self inGridAt: index put: NSFilledState ] ].
+
+					emptyIntervals
+						detect: [ :interval | interval includesAny: (filledInterval max - minSizeOfTheFilledInterval to: filledInterval max) ]
+						ifFound: [ :emptyInterval | filledInterval max + 1 to: emptyInterval max + minSizeOfTheFilledInterval do: [ :index | self inGridAt: index put: NSFilledState ] ] ] ]
 ]
 
 { #category : #checking }
