@@ -28,11 +28,11 @@ NSOverlapSolver >> resolve [
 					counter := interval max + 2.
 					interval ].
 
-			"[ "clues gridAxis filledIntervals reversed
+			[ clues gridAxis filledIntervals reversed
 				detect: [ :filledInterval | directIntervals noneSatisfy: [ :int | int includesAll: filledInterval ] ]
 				ifFound: [ :filledInterval | 
 					| intervalToShift currentIndex |
-					intervalToShift := directIntervals reversed detect: [ :interval | interval max < filledInterval min and: [ interval size >= filledInterval size ] ].
+					intervalToShift := directIntervals reversed detect: [ :interval | interval min < filledInterval min and: [ interval size >= filledInterval size ] ].
 					currentIndex := directIntervals indexOf: intervalToShift.
 					directIntervals at: currentIndex put: intervalToShift + (filledInterval max - intervalToShift max).
 					[ currentIndex < directIntervals size ]
@@ -44,7 +44,7 @@ NSOverlapSolver >> resolve [
 								ifFalse: [ directIntervals at: currentIndex + 1 put: nextInterval + currentInterval max - nextInterval min + 2.
 									currentIndex + 1 ] ].
 					true ]
-				ifNone: [ false ]" ] whileTrue".
+				ifNone: [ false ] ] whileTrue.
 
 			counter := axisSize.
 			invertedIntervals := (clues reverse
@@ -58,11 +58,11 @@ NSOverlapSolver >> resolve [
 					counter := interval min - 2.
 					interval ]) reversed.
 
-			"[" clues gridAxis filledIntervals
+			[ clues gridAxis filledIntervals
 				detect: [ :filledInterval | invertedIntervals noneSatisfy: [ :int | int includesAll: filledInterval ] ]
 				ifFound: [ :filledInterval | 
 					| intervalToShift currentIndex |
-					intervalToShift := invertedIntervals detect: [ :interval | interval min > filledInterval max and: [ interval size >= filledInterval size ] ].
+					intervalToShift := invertedIntervals detect: [ :interval | interval max > filledInterval max and: [ interval size >= filledInterval size ] ].
 					currentIndex := invertedIntervals indexOf: intervalToShift.
 					invertedIntervals at: currentIndex put: intervalToShift - (intervalToShift min - filledInterval min).
 					[ currentIndex > 1 ]
@@ -74,7 +74,7 @@ NSOverlapSolver >> resolve [
 								ifFalse: [ invertedIntervals at: currentIndex - 1 put: nextInterval - (nextInterval max - currentInterval min + 2).
 									currentIndex - 1 ] ].
 					true ]
-				ifNone: [ false ] "] whileTrue".
+				ifNone: [ false ] ] whileTrue.
 
 			counter := 1.
 			directIntervals
