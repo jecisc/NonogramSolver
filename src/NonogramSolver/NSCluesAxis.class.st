@@ -140,7 +140,11 @@ NSCluesAxis >> checkIfFilledIntervalCloseToEmptyCasesCanBeExpandedToTheSizeOfThe
 
 	| axis emptyIntervals |
 	axis := self gridAxis.
-	emptyIntervals := axis emptyIntervals.
+	"Add also the borders of the axis."
+	emptyIntervals := axis emptyIntervals
+		addFirst: (0 to: 0);
+		addLast: (self axisSize + 1 to: self axisSize + 1);
+		yourself.
 	axis filledIntervals
 		do: [ :filledInterval | 
 			(self unresolvedClues select: [ :clue | clue canIncludeAll: filledInterval ])
