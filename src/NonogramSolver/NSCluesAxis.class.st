@@ -68,6 +68,7 @@ NSCluesAxis >> check [
 	self checkIfClueContainsAFillIntervalOfItsSizeThatSurroundingsAreNotInPossibleIntervals.
 	self checkIfFilledIntervalCloseToEmptyCasesCanBeExpandedToTheSizeOfTheSmallestMatchingClue.
 	self checkIfFilledIntervalsCanReducePossibleIntervalsSize.
+	self checkIfCloseFilledIntervalsCanBeJoined.
 	clues do: #check.
 	self checkIfAllCluesAreSolvedThatTheAxeIsResolved
 ]
@@ -99,6 +100,21 @@ NSCluesAxis >> checkIfAxisIsFullyFilled [
 
 	"If all filled interval matches the clues, then the line is full and we can ensure the clues are updated."
 	filledIntervals doWithIndex: [ :interval :index | (self at: index) restrainTo: interval ]
+]
+
+{ #category : #checking }
+NSCluesAxis >> checkIfCloseFilledIntervalsCanBeJoined [
+	"1 2 1 | | | |o| |o| | | | | | |
+	can be:
+	1 2 1 | | | |o|x|o| | | | | | |"
+
+	self gridAxis filledIntervals
+		overlappingPairsDo: [ :filledInterval1 :filledInterval2 | 
+			filledInterval2 min - filledInterval1 max = 2
+				ifTrue: [ ((self unresolvedClues select: [ :clue | (clue canIncludeAll: filledInterval1) and: [ clue canIncludeAll: filledInterval2 ] ])
+						ifEmpty: [ true ]
+						ifNotEmpty: [ :matchingClues | (filledInterval1 min to: filledInterval2 max) size > (matchingClues collect: #value) max ])
+						ifTrue: [ self inGridAt: filledInterval1 max + 1 put: NSEmptyState ] ] ]
 ]
 
 { #category : #checking }
