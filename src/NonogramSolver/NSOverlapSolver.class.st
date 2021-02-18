@@ -81,6 +81,5 @@ NSOverlapSolver >> resolve [
 				with: invertedIntervals
 				do: [ :int1 :int2 | 
 					(clues at: counter) restrainTo: (int1 min to: int2 max).
-					(int1 intersection: int2) do: [ :index | clues inGridAt: index put: NSFilledState ].
 					counter := counter + 1 ] ]
 ]

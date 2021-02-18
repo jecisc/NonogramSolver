@@ -8,3 +8,8 @@ Class {
 NSEmptyState class >> isEmpty [
 	^ true
 ]
+
+{ #category : #printing }
+NSEmptyState class >> printOn: aStream [
+	aStream nextPut: $x
+]

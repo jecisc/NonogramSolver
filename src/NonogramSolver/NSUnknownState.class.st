@@ -8,3 +8,8 @@ Class {
 NSUnknownState class >> isKnown [
 	^ false
 ]
+
+{ #category : #printing }
+NSUnknownState class >> printOn: aStream [
+	aStream nextPut: $_
+]
