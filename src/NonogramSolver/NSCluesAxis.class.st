@@ -67,6 +67,7 @@ NSCluesAxis >> check [
 	self checkAllFilledIntervalsOfTheSizeOfTheirMatchingCluesAreSurroundedByEmptyCases.
 	self checkIfClueContainsAFillIntervalOfItsSizeThatSurroundingsAreNotInPossibleIntervals.
 	self checkIfFilledIntervalCloseToEmptyCasesCanBeExpandedToTheSizeOfTheSmallestMatchingClue.
+	self checkIfFilledIntervalsCanReducePossibleIntervalsSize.
 	clues do: #check.
 	self checkIfAllCluesAreSolvedThatTheAxeIsResolved
 ]
@@ -168,6 +169,29 @@ NSCluesAxis >> checkIfFilledIntervalsAreBiggerThanClueValue [
 		do: [ :filledInterval | 
 			(self unresolvedClues select: [ :clue | (clue canIncludeAny: filledInterval) and: [ clue value < filledInterval size ] ])
 				ifNotEmpty: [ :matchingClues | matchingClues do: [ :clue | clue ban: (filledInterval min - 1 to: filledInterval max + 1) ] ] ]
+]
+
+{ #category : #checking }
+NSCluesAxis >> checkIfFilledIntervalsCanReducePossibleIntervalsSize [
+	"For example if we have a clue whose possible interval is:
+	
+	| | |o|o| | | |
+	
+	And its size is 3, then we can ban the first case because if the clue was there, then we fill more cases than required."
+
+	self gridAxis filledIntervals
+		do: [ :filledInterval | 
+			self unresolvedClues
+				do: [ :clue | 
+					clue possibleIntervals
+						detect: [ :interval | interval includesAny: filledInterval ]
+						ifFound: [ :possibleInterval | 
+							(possibleInterval min to: filledInterval max) size > clue value
+								ifTrue: [ ((possibleInterval min to: possibleInterval min + clue value) intersection: filledInterval)
+										ifNotEmpty: [ clue ban: (possibleInterval min to: filledInterval max - clue value) ] ].
+							(filledInterval min to: possibleInterval max) size > clue value
+								ifTrue: [ ((possibleInterval max - clue value to: possibleInterval max) intersection: filledInterval)
+										ifNotEmpty: [ clue ban: (filledInterval min + clue value to: possibleInterval max) ] ] ] ] ]
 ]
 
 { #category : #checking }
