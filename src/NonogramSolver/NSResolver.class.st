@@ -46,11 +46,15 @@ NSResolver class >> launchWebSocket [
 ]
 
 { #category : #'instance creation' }
-NSResolver class >> on: aDOM [ 
-	^ self new
-		on: aDOM;
-		resolve;
-		solution
+NSResolver class >> on: aDOM [
+	| result |
+	('Time to solve: '
+		,
+			[ result := self new
+				on: aDOM;
+				resolve;
+				solution ] timeToRun asString) record.
+	^ result
 ]
 
 { #category : #'as yet unclassified' }
