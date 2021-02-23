@@ -21,7 +21,7 @@ NSOverlapSolver >> resolve [
 			directIntervals := clues
 				collectWithIndex: [ :clue :index | 
 					| interval |
-					interval := counter to: counter + clue value - 1.
+					interval := counter to: counter + clue - 1.
 					(clue canIncludeAll: interval) ifFalse: [ interval := interval + ((clue possibleIntervals detect: [ :int | int min >= counter ]) min - interval min) ].
 					"If the interval is followed by filled cases, then we can move it to embded it."
 					[ interval max + 1 <= axisSize and: [ (clues inGridAt: interval max + 1) isFilled ] ] whileTrue: [ interval := interval + 1 ].
@@ -50,7 +50,7 @@ NSOverlapSolver >> resolve [
 			invertedIntervals := (clues reverse
 				collectWithIndex: [ :clue :index | 
 					| interval |
-					interval := counter - (clue value - 1) to: counter.
+					interval := counter - clue + 1 to: counter.
 					(clue canIncludeAll: interval)
 						ifFalse: [ interval := interval - (interval max - (clue possibleIntervals reversed detect: [ :int | int max <= counter ]) max) ].
 					"If the interval is followed by filled cases, then we can move it to embded it."

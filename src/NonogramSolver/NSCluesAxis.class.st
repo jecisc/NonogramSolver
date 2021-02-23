@@ -105,13 +105,13 @@ NSCluesAxis >> checkFilleIntervalNextToEmptyCaseWatchingTwoCluesCanAddAnEmptyCas
 
 							((emptyCases includes: filledInterval min - 1)
 								and: [ (emptyCases includes: filledInterval max + 1) not
-										and: [ matchingClues first value >= matchingClues second value
+										and: [ matchingClues first >= matchingClues second
 												and: [ matchingClues includesAll: (clues select: [ :clue | clue canInclude: filledInterval min + maxValue ]) ] ] ])
 								ifTrue: [ self inGridAt: filledInterval min + maxValue put: NSEmptyState ].
 
 							((emptyCases includes: filledInterval max + 1)
 								and: [ (emptyCases includes: filledInterval min - 1) not
-										and: [ matchingClues second value >= matchingClues first value
+										and: [ matchingClues second >= matchingClues first
 												and: [ matchingClues includesAll: (clues select: [ :clue | clue canInclude: filledInterval max - maxValue ]) ] ] ])
 								ifTrue: [ self inGridAt: filledInterval max - maxValue put: NSEmptyState ] ] ] ]
 ]
@@ -145,7 +145,7 @@ NSCluesAxis >> checkIfCloseFilledIntervalsCanBeJoined [
 			filledInterval2 min - filledInterval1 max = 2
 				ifTrue: [ ((self unresolvedClues select: [ :clue | (clue canIncludeAll: filledInterval1) and: [ clue canIncludeAll: filledInterval2 ] ])
 						ifEmpty: [ true ]
-						ifNotEmpty: [ :matchingClues | (filledInterval1 min to: filledInterval2 max) size > (matchingClues collect: #value) max ])
+						ifNotEmpty: [ :matchingClues | (filledInterval1 min to: filledInterval2 max) size > matchingClues max ])
 						ifTrue: [ self inGridAt: filledInterval1 max + 1 put: NSEmptyState ] ] ]
 ]
 
@@ -198,15 +198,13 @@ NSCluesAxis >> checkIfFilledIntervalCloseToEmptyCasesCanBeExpandedToTheSizeOfThe
 		do: [ :filledInterval | 
 			(self unresolvedClues select: [ :clue | clue canIncludeAll: filledInterval ])
 				ifNotEmpty: [ :matchingClues | 
-					| minSizeOfTheFilledInterval |
-					minSizeOfTheFilledInterval := (matchingClues collect: #value) min.
 					emptyIntervals
-						detect: [ :interval | interval includesAny: (filledInterval max to: filledInterval min + minSizeOfTheFilledInterval) ]
-						ifFound: [ :emptyInterval | (emptyInterval min - minSizeOfTheFilledInterval to: filledInterval min - 1) do: [ :index | self inGridAt: index put: NSFilledState ] ].
+						detect: [ :interval | interval includesAny: (filledInterval max to: filledInterval min + matchingClues min) ]
+						ifFound: [ :emptyInterval | (emptyInterval min - matchingClues min to: filledInterval min - 1) do: [ :index | self inGridAt: index put: NSFilledState ] ].
 
 					emptyIntervals
-						detect: [ :interval | interval includesAny: (filledInterval max - minSizeOfTheFilledInterval to: filledInterval max) ]
-						ifFound: [ :emptyInterval | filledInterval max + 1 to: emptyInterval max + minSizeOfTheFilledInterval do: [ :index | self inGridAt: index put: NSFilledState ] ] ] ]
+						detect: [ :interval | interval includesAny: (filledInterval max - matchingClues min to: filledInterval max) ]
+						ifFound: [ :emptyInterval | filledInterval max + 1 to: emptyInterval max + matchingClues min do: [ :index | self inGridAt: index put: NSFilledState ] ] ] ]
 ]
 
 { #category : #checking }
@@ -215,7 +213,7 @@ NSCluesAxis >> checkIfFilledIntervalsAreBiggerThanClueValue [
 
 	self gridAxis filledIntervals
 		do: [ :filledInterval | 
-			(self unresolvedClues select: [ :clue | (clue canIncludeAny: filledInterval) and: [ clue value < filledInterval size ] ])
+			(self unresolvedClues select: [ :clue | (clue canIncludeAny: filledInterval) and: [ clue < filledInterval size ] ])
 				ifNotEmpty: [ :matchingClues | matchingClues do: [ :clue | clue ban: (filledInterval min - 1 to: filledInterval max + 1) ] ] ]
 ]
 
@@ -234,12 +232,12 @@ NSCluesAxis >> checkIfFilledIntervalsCanReducePossibleIntervalsSize [
 					clue possibleIntervals
 						detect: [ :interval | interval includesAny: filledInterval ]
 						ifFound: [ :possibleInterval | 
-							(possibleInterval min to: filledInterval max) size > clue value
-								ifTrue: [ ((possibleInterval min to: possibleInterval min + clue value) intersection: filledInterval)
-										ifNotEmpty: [ clue ban: (possibleInterval min to: filledInterval max - clue value) ] ].
-							(filledInterval min to: possibleInterval max) size > clue value
-								ifTrue: [ ((possibleInterval max - clue value to: possibleInterval max) intersection: filledInterval)
-										ifNotEmpty: [ clue ban: (filledInterval min + clue value to: possibleInterval max) ] ] ] ] ]
+							(possibleInterval min to: filledInterval max) size > clue
+								ifTrue: [ ((possibleInterval min to: possibleInterval min + clue) intersection: filledInterval)
+										ifNotEmpty: [ clue ban: (possibleInterval min to: filledInterval max - clue) ] ].
+							(filledInterval min to: possibleInterval max) size > clue
+								ifTrue: [ ((possibleInterval max - clue to: possibleInterval max) intersection: filledInterval)
+										ifNotEmpty: [ clue ban: (filledInterval min + clue to: possibleInterval max) ] ] ] ] ]
 ]
 
 { #category : #checking }
@@ -249,7 +247,7 @@ NSCluesAxis >> checkIfUniquePossibleIntervalIsSmallerThanTwiceTheClueValue [
 			clue possibleIntervals size = 1
 				ifTrue: [ | possibleInterval |
 					possibleInterval := clue possibleInterval.
-					((possibleInterval min to: possibleInterval min + clue value - 1) intersection: (possibleInterval max - clue value + 1 to: possibleInterval max))
+					((possibleInterval min to: possibleInterval min + clue - 1) intersection: (possibleInterval max - clue + 1 to: possibleInterval max))
 						ifNotEmpty: [ :intersection | intersection do: [ :index | self inGridAt: index put: NSFilledState ] ] ] ]
 ]
 
@@ -275,7 +273,7 @@ NSCluesAxis >> checkRestrainPossibleIntervalsIfFilledIntervalMatchesOnlyOneClue 
 					matchingClues size = 1
 						ifTrue: [ | clue |
 							clue := matchingClues anyOne.
-							clue restrainTo: (filledInterval max - clue value + 1 to: filledInterval min + clue value - 1) ] ] ]
+							clue restrainTo: (filledInterval max - clue + 1 to: filledInterval min + clue - 1) ] ] ]
 ]
 
 { #category : #accessing }

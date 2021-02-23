@@ -1,6 +1,6 @@
 Class {
 	#name : #NSClue,
-	#superclass : #Object,
+	#superclass : #Magnitude,
 	#instVars : [
 		'possibleIntervals',
 		'isSolved',
@@ -23,6 +23,16 @@ NSClue class >> clue: anInteger axis: anAxis [
 		value: anInteger;
 		axis: anAxis;
 		yourself
+]
+
+{ #category : #testing }
+NSClue >> < aNSClue [ 
+	^ value < aNSClue 
+]
+
+{ #category : #'as yet unclassified' }
+NSClue >> adaptToNumber: receiver andSend: aSelector [
+	^ receiver perform: aSelector with: value
 ]
 
 { #category : #accessing }
@@ -195,6 +205,7 @@ NSClue >> solved [
 
 { #category : #accessing }
 NSClue >> value [
+	"('Called from ', thisContext sender asString) record."
 	^ value
 ]
 
