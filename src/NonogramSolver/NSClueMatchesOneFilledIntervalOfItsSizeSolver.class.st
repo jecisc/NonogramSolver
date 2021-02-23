@@ -10,14 +10,12 @@ NSClueMatchesOneFilledIntervalOfItsSizeSolver class >> priority [
 ]
 
 { #category : #resolving }
-NSClueMatchesOneFilledIntervalOfItsSizeSolver >> resolve [
+NSClueMatchesOneFilledIntervalOfItsSizeSolver >> resolveCurrentAxis [
 	"If a filled interval matches only one clue and is the same size as this clue, then we can resolve the clue."
 
-	self
-		withUnfinishedAxisDo: [ :clues :axisSize | 
-			clues gridAxis filledIntervals
-				do: [ :filledInterval | 
-					(clues unresolvedClues select: [ :clue | clue canIncludeAll: filledInterval ])
-						ifNotEmpty:
-							[ :matchingClues | (matchingClues size = 1 and: [ matchingClues anyOne value = filledInterval size ]) ifTrue: [ matchingClues anyOne restrainTo: filledInterval ] ] ] ]
+	self filledIntervals
+		do: [ :filledInterval | 
+			(clues unresolvedClues select: [ :clue | clue canIncludeAll: filledInterval ])
+				ifNotEmpty:
+					[ :matchingClues | (matchingClues size = 1 and: [ matchingClues anyOne value = filledInterval size ]) ifTrue: [ matchingClues anyOne restrainTo: filledInterval ] ] ]
 ]

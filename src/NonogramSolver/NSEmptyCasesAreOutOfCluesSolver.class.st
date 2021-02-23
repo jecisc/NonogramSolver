@@ -10,7 +10,7 @@ NSEmptyCasesAreOutOfCluesSolver class >> priority [
 ]
 
 { #category : #resolving }
-NSEmptyCasesAreOutOfCluesSolver >> resolve [
+NSEmptyCasesAreOutOfCluesSolver >> resolveCurrentAxis [
 	"Remove all empty intervals from the possible intervals of clues.
 	Example:
 	
@@ -18,8 +18,5 @@ NSEmptyCasesAreOutOfCluesSolver >> resolve [
 	
 	If the possible intervals for 3 were { (1 to: 16) } then we can make it { (1 to: 5) . (7 to: 12) . (14 to: 16) }"
 
-	self
-		withUnfinishedAxisDo: [ :clues :axisSize | 
-			clues gridAxis emptyIntervals
-				ifNotEmpty: [ :emptyIntervals | clues unresolvedClues do: [ :clue | emptyIntervals do: [ :emptyInterval | clue ban: emptyInterval ] ] ] ]
+	clues unresolvedClues do: [ :clue | self emptyIntervals do: [ :emptyInterval | clue ban: emptyInterval ] ]
 ]

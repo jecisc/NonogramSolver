@@ -21,6 +21,6 @@ NSAllEmptyFilledSolver class >> priority [
 ]
 
 { #category : #resolve }
-NSAllEmptyFilledSolver >> resolve [
-	self withUnfinishedAxisDo: [ :clues :axisSize | clues ifEmpty: [ 1 to: axisSize do: [ :index | clues inGridAt: index put: NSEmptyState ] ] ]
+NSAllEmptyFilledSolver >> resolveCurrentAxis [
+	clues ifEmpty: [ 1 to: axisSize do: [ :index | self at: index put: NSEmptyState ] ]
 ]

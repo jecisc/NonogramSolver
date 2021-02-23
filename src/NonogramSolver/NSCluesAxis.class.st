@@ -58,8 +58,6 @@ NSCluesAxis >> banIntervalOf: aNSClue [
 NSCluesAxis >> check [
 	self isResolved ifTrue: [ ^ self ].
 
-	self checkIfFilledIntervalAreEntirelyInClues.
-	self checkIfFilledIntervalsAreBiggerThanClueValue.
 	self checkRestrainPossibleIntervalsIfFilledIntervalMatchesOnlyOneClue.
 	self checkAllFilledIntervalsOfTheSizeOfTheirMatchingCluesAreSurroundedByEmptyCases.
 	self checkIfClueContainsAFillIntervalOfItsSizeThatSurroundingsAreNotInPossibleIntervals.
@@ -145,16 +143,6 @@ NSCluesAxis >> checkIfClueContainsAFillIntervalOfItsSizeThatSurroundingsAreNotIn
 ]
 
 { #category : #checking }
-NSCluesAxis >> checkIfFilledIntervalAreEntirelyInClues [
-	"If a filled interval is only partly in a clue, we can remove it and the cases surrounding it since we need at least one space between two intervals."
-
-	self gridAxis filledIntervals
-		do: [ :filledInterval | 
-			(self unresolvedClues select: [ :clue | (clue canIncludeAny: filledInterval) and: [ (clue canIncludeAll: filledInterval) not ] ])
-				ifNotEmpty: [ :matchingClues | matchingClues do: [ :clue | clue ban: (filledInterval min - 1 to: filledInterval max + 1) ] ] ]
-]
-
-{ #category : #checking }
 NSCluesAxis >> checkIfFilledIntervalCloseToEmptyCasesCanBeExpandedToTheSizeOfTheSmallestMatchingClue [
 	"For example if we have:
 	| | |x|x| | |o|o|o| | | | | | |
@@ -179,16 +167,6 @@ NSCluesAxis >> checkIfFilledIntervalCloseToEmptyCasesCanBeExpandedToTheSizeOfThe
 					emptyIntervals
 						detect: [ :interval | interval includesAny: (filledInterval max - matchingClues min to: filledInterval max) ]
 						ifFound: [ :emptyInterval | filledInterval max + 1 to: emptyInterval max + matchingClues min do: [ :index | self inGridAt: index put: NSFilledState ] ] ] ]
-]
-
-{ #category : #checking }
-NSCluesAxis >> checkIfFilledIntervalsAreBiggerThanClueValue [
-	"If a filled interval is bigger than a matching clue, we can remove it and the cases surrounding it since we need at least one space between two intervals."
-
-	self gridAxis filledIntervals
-		do: [ :filledInterval | 
-			(self unresolvedClues select: [ :clue | (clue canIncludeAny: filledInterval) and: [ clue < filledInterval size ] ])
-				ifNotEmpty: [ :matchingClues | matchingClues do: [ :clue | clue ban: (filledInterval min - 1 to: filledInterval max + 1) ] ] ]
 ]
 
 { #category : #checking }
