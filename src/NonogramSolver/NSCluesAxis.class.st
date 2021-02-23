@@ -58,27 +58,11 @@ NSCluesAxis >> banIntervalOf: aNSClue [
 NSCluesAxis >> check [
 	self isResolved ifTrue: [ ^ self ].
 
-	self checkRestrainPossibleIntervalsIfFilledIntervalMatchesOnlyOneClue.
-	self checkAllFilledIntervalsOfTheSizeOfTheirMatchingCluesAreSurroundedByEmptyCases.
-	self checkIfClueContainsAFillIntervalOfItsSizeThatSurroundingsAreNotInPossibleIntervals.
-	self checkIfFilledIntervalCloseToEmptyCasesCanBeExpandedToTheSizeOfTheSmallestMatchingClue.
-	self checkIfFilledIntervalsCanReducePossibleIntervalsSize.
 	self checkIfCloseFilledIntervalsCanBeJoined.
 	self checkIfUniquePossibleIntervalIsSmallerThanTwiceTheClueValue.
 	self checkFilleIntervalNextToEmptyCaseWatchingTwoCluesCanAddAnEmptyCase.
 	clues do: #check.
 	self checkIfAllCluesAreSolvedThatTheAxeIsResolved
-]
-
-{ #category : #checking }
-NSCluesAxis >> checkAllFilledIntervalsOfTheSizeOfTheirMatchingCluesAreSurroundedByEmptyCases [
-	self gridAxis filledIntervals
-		do: [ :filledInterval | 
-			(self unresolvedClues select: [ :clue | clue canIncludeAll: filledInterval ])
-				ifNotEmpty: [ :matchingClues | 
-					(filledInterval size = matchingClues anyOne value and: [ matchingClues size > 1 and: [ (matchingClues collect: #value) asSet size = 1 ] ])
-						ifTrue: [ filledInterval min = 1 ifFalse: [ self inGridAt: filledInterval min - 1 put: NSEmptyState ].
-							filledInterval max = self axisSize ifFalse: [ self inGridAt: filledInterval max + 1 put: NSEmptyState ] ] ] ]
 ]
 
 { #category : #checking }
@@ -133,66 +117,6 @@ NSCluesAxis >> checkIfCloseFilledIntervalsCanBeJoined [
 ]
 
 { #category : #checking }
-NSCluesAxis >> checkIfClueContainsAFillIntervalOfItsSizeThatSurroundingsAreNotInPossibleIntervals [
-	self gridAxis filledIntervals
-		do: [ :filledInterval | 
-			(self unresolvedClues select: [ :clue | clue value = filledInterval size and: [ clue canIncludeAll: filledInterval ] ])
-				do: [ :clue | 
-					filledInterval min > 1 ifTrue: [ clue ban: (filledInterval min - 1 to: filledInterval min - 1) ].
-					filledInterval max < self axisSize ifTrue: [ clue ban: (filledInterval max + 1 to: filledInterval max + 1) ] ] ]
-]
-
-{ #category : #checking }
-NSCluesAxis >> checkIfFilledIntervalCloseToEmptyCasesCanBeExpandedToTheSizeOfTheSmallestMatchingClue [
-	"For example if we have:
-	| | |x|x| | |o|o|o| | | | | | |
-	And the filled interval can be associated to a clue of size 7 and another of size 9, then we can fill like this:
-	| | |x|x| | |o|o|o|o|o| | | | |"
-
-	| axis emptyIntervals |
-	axis := self gridAxis.
-	"Add also the borders of the axis."
-	emptyIntervals := axis emptyIntervals
-		addFirst: (0 to: 0);
-		addLast: (self axisSize + 1 to: self axisSize + 1);
-		yourself.
-	axis filledIntervals
-		do: [ :filledInterval | 
-			(self unresolvedClues select: [ :clue | clue canIncludeAll: filledInterval ])
-				ifNotEmpty: [ :matchingClues | 
-					emptyIntervals
-						detect: [ :interval | interval includesAny: (filledInterval max to: filledInterval min + matchingClues min) ]
-						ifFound: [ :emptyInterval | (emptyInterval min - matchingClues min to: filledInterval min - 1) do: [ :index | self inGridAt: index put: NSFilledState ] ].
-
-					emptyIntervals
-						detect: [ :interval | interval includesAny: (filledInterval max - matchingClues min to: filledInterval max) ]
-						ifFound: [ :emptyInterval | filledInterval max + 1 to: emptyInterval max + matchingClues min do: [ :index | self inGridAt: index put: NSFilledState ] ] ] ]
-]
-
-{ #category : #checking }
-NSCluesAxis >> checkIfFilledIntervalsCanReducePossibleIntervalsSize [
-	"For example if we have a clue whose possible interval is:
-	
-	| | |o|o| | | |
-	
-	And its size is 3, then we can ban the first case because if the clue was there, then we fill more cases than required."
-
-	self gridAxis filledIntervals
-		do: [ :filledInterval | 
-			self unresolvedClues
-				do: [ :clue | 
-					clue possibleIntervals
-						detect: [ :interval | interval includesAny: filledInterval ]
-						ifFound: [ :possibleInterval | 
-							(possibleInterval min to: filledInterval max) size > clue
-								ifTrue: [ ((possibleInterval min to: possibleInterval min + clue) intersection: filledInterval)
-										ifNotEmpty: [ clue ban: (possibleInterval min to: filledInterval max - clue) ] ].
-							(filledInterval min to: possibleInterval max) size > clue
-								ifTrue: [ ((possibleInterval max - clue to: possibleInterval max) intersection: filledInterval)
-										ifNotEmpty: [ clue ban: (filledInterval min + clue to: possibleInterval max) ] ] ] ] ]
-]
-
-{ #category : #checking }
 NSCluesAxis >> checkIfUniquePossibleIntervalIsSmallerThanTwiceTheClueValue [
 	self unresolvedClues
 		do: [ :clue | 
@@ -201,23 +125,6 @@ NSCluesAxis >> checkIfUniquePossibleIntervalIsSmallerThanTwiceTheClueValue [
 					possibleInterval := clue possibleInterval.
 					((possibleInterval min to: possibleInterval min + clue - 1) intersection: (possibleInterval max - clue + 1 to: possibleInterval max))
 						ifNotEmpty: [ :intersection | intersection do: [ :index | self inGridAt: index put: NSFilledState ] ] ] ]
-]
-
-{ #category : #checking }
-NSCluesAxis >> checkRestrainPossibleIntervalsIfFilledIntervalMatchesOnlyOneClue [
-	"If a filled interval is in a clue, then we can restrain the possibleIntervals of the clue to remove cases too far from this interval.
-	
-	Implementation detail:
-		we can use #canIncludeAny: instead of #canIncludeAll: because this check is called after #checkIfFilledIntervalAreEntirelyInClues"
-
-	self gridAxis filledIntervals
-		do: [ :filledInterval | 
-			(self unresolvedClues select: [ :clue | clue canIncludeAny: filledInterval ])
-				ifNotEmpty: [ :matchingClues | 
-					matchingClues size = 1
-						ifTrue: [ | clue |
-							clue := matchingClues anyOne.
-							clue restrainTo: (filledInterval max - clue + 1 to: filledInterval min + clue - 1) ] ] ]
 ]
 
 { #category : #accessing }

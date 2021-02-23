@@ -14,7 +14,7 @@ NSPushBorderSolver class >> priority [
 
 { #category : #resolving }
 NSPushBorderSolver >> resolveCurrentAxis [
-	clues unresolvedClues
+	self unresolvedClues
 		do: [ :clue | 
 			| possibleInterval |
 			possibleInterval := clue possibleIntervals first.

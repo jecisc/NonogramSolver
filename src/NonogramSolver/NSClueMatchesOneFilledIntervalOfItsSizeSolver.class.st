@@ -15,7 +15,7 @@ NSClueMatchesOneFilledIntervalOfItsSizeSolver >> resolveCurrentAxis [
 
 	self filledIntervals
 		do: [ :filledInterval | 
-			(clues unresolvedClues select: [ :clue | clue canIncludeAll: filledInterval ])
+			(self unresolvedClues select: [ :clue | clue canIncludeAll: filledInterval ])
 				ifNotEmpty:
 					[ :matchingClues | (matchingClues size = 1 and: [ matchingClues anyOne value = filledInterval size ]) ifTrue: [ matchingClues anyOne restrainTo: filledInterval ] ] ]
 ]

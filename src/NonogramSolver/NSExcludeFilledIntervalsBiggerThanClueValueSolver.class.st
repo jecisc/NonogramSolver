@@ -15,6 +15,6 @@ NSExcludeFilledIntervalsBiggerThanClueValueSolver >> resolveCurrentAxis [
 
 	self filledIntervals
 		do: [ :filledInterval | 
-			(clues unresolvedClues select: [ :clue | (clue canIncludeAny: filledInterval) and: [ clue < filledInterval size ] ])
+			(self unresolvedClues select: [ :clue | (clue canIncludeAny: filledInterval) and: [ clue < filledInterval size ] ])
 				ifNotEmpty: [ :matchingClues | matchingClues do: [ :clue | clue ban: (filledInterval min - 1 to: filledInterval max + 1) ] ] ]
 ]

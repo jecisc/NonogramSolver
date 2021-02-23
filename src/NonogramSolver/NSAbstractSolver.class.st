@@ -110,6 +110,11 @@ NSAbstractSolver >> resolver: aNSResolver [
 	resolver := aNSResolver
 ]
 
+{ #category : #accessing }
+NSAbstractSolver >> unresolvedClues [
+	^ clues unresolvedClues
+]
+
 { #category : #resolve }
 NSAbstractSolver >> withUnfinishedAxisDo: aBlock [
 	self

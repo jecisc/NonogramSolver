@@ -18,5 +18,5 @@ NSEmptyCasesAreOutOfCluesSolver >> resolveCurrentAxis [
 	
 	If the possible intervals for 3 were { (1 to: 16) } then we can make it { (1 to: 5) . (7 to: 12) . (14 to: 16) }"
 
-	clues unresolvedClues do: [ :clue | self emptyIntervals do: [ :emptyInterval | clue ban: emptyInterval ] ]
+	self unresolvedClues do: [ :clue | self emptyIntervals do: [ :emptyInterval | clue ban: emptyInterval ] ]
 ]

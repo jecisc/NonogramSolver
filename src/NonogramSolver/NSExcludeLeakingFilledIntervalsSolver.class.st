@@ -15,6 +15,6 @@ NSExcludeLeakingFilledIntervalsSolver >> resolveCurrentAxis [
 
 	self filledIntervals
 		do: [ :filledInterval | 
-			(clues unresolvedClues select: [ :clue | (clue canIncludeAny: filledInterval) and: [ (clue canIncludeAll: filledInterval) not ] ])
+			(self unresolvedClues select: [ :clue | (clue canIncludeAny: filledInterval) and: [ (clue canIncludeAll: filledInterval) not ] ])
 				ifNotEmpty: [ :matchingClues | matchingClues do: [ :clue | clue ban: (filledInterval min - 1 to: filledInterval max + 1) ] ] ]
 ]
