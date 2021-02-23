@@ -5,7 +5,7 @@ Class {
 		'clues',
 		'cluesList'
 	],
-	#category : #NonogramSolver
+	#category : #'NonogramSolver-Model'
 }
 
 { #category : #'instance creation' }
@@ -58,9 +58,6 @@ NSCluesAxis >> banIntervalOf: aNSClue [
 NSCluesAxis >> check [
 	self isResolved ifTrue: [ ^ self ].
 
-	self checkIfFilledIntervalCanFinishAClue.
-	self checkIfAxisIsFullyFilled.
-	self checkRemoveEmptyCasesFromPossibleIntervals.
 	self checkIfFilledIntervalAreEntirelyInClues.
 	self checkIfFilledIntervalsAreBiggerThanClueValue.
 	self checkRestrainPossibleIntervalsIfFilledIntervalMatchesOnlyOneClue.
@@ -123,18 +120,6 @@ NSCluesAxis >> checkIfAllCluesAreSolvedThatTheAxeIsResolved [
 ]
 
 { #category : #checking }
-NSCluesAxis >> checkIfAxisIsFullyFilled [
-	| filledIntervals |
-	filledIntervals := self gridAxis filledIntervals.
-	(filledIntervals size = self size) ifFalse: [ ^ self ].
-	
-	filledIntervals doWithIndex: [ :interval :index | (interval size = (self at: index) value) ifFalse: [ ^ self ] ].
-
-	"If all filled interval matches the clues, then the line is full and we can ensure the clues are updated."
-	filledIntervals doWithIndex: [ :interval :index | (self at: index) restrainTo: interval ]
-]
-
-{ #category : #checking }
 NSCluesAxis >> checkIfCloseFilledIntervalsCanBeJoined [
 	"1 2 1 | | | |o| |o| | | | | | |
 	can be:
@@ -167,17 +152,6 @@ NSCluesAxis >> checkIfFilledIntervalAreEntirelyInClues [
 		do: [ :filledInterval | 
 			(self unresolvedClues select: [ :clue | (clue canIncludeAny: filledInterval) and: [ (clue canIncludeAll: filledInterval) not ] ])
 				ifNotEmpty: [ :matchingClues | matchingClues do: [ :clue | clue ban: (filledInterval min - 1 to: filledInterval max + 1) ] ] ]
-]
-
-{ #category : #checking }
-NSCluesAxis >> checkIfFilledIntervalCanFinishAClue [
-	"If a filled interval matches only one clue and is the same size as this clue, then we can resolve the clue."
-
-	self gridAxis filledIntervals
-		do: [ :filledInterval | 
-			| matchingClues |
-			matchingClues := self unresolvedClues select: [ :clue | clue canIncludeAll: filledInterval ].
-			(matchingClues size = 1 and: [ matchingClues anyOne value = filledInterval size ]) ifTrue: [ matchingClues anyOne restrainTo: filledInterval ] ]
 ]
 
 { #category : #checking }
@@ -249,14 +223,6 @@ NSCluesAxis >> checkIfUniquePossibleIntervalIsSmallerThanTwiceTheClueValue [
 					possibleInterval := clue possibleInterval.
 					((possibleInterval min to: possibleInterval min + clue - 1) intersection: (possibleInterval max - clue + 1 to: possibleInterval max))
 						ifNotEmpty: [ :intersection | intersection do: [ :index | self inGridAt: index put: NSFilledState ] ] ] ]
-]
-
-{ #category : #checking }
-NSCluesAxis >> checkRemoveEmptyCasesFromPossibleIntervals [
-	"Remove all empty intervals from the possible intervals of clues."
-
-	self gridAxis emptyIntervals
-		ifNotEmpty: [ :emptyIntervals | self unresolvedClues do: [ :clue | emptyIntervals do: [ :emptyInterval | clue ban: emptyInterval ] ] ]
 ]
 
 { #category : #checking }

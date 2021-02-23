@@ -5,7 +5,7 @@ Class {
 		'cluesAxis',
 		'resolver'
 	],
-	#category : #NonogramSolver
+	#category : #'NonogramSolver-Model'
 }
 
 { #category : #'instance creation' }

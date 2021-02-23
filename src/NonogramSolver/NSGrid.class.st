@@ -5,7 +5,7 @@ Class {
 		'content',
 		'wasRecentlyUpdated'
 	],
-	#category : #NonogramSolver
+	#category : #'NonogramSolver-Model'
 }
 
 { #category : #'instance creation' }

@@ -7,7 +7,7 @@ Class {
 		'grid',
 		'resolutionPass'
 	],
-	#category : #NonogramSolver
+	#category : #'NonogramSolver-Model'
 }
 
 { #category : #'class initialization' }
@@ -185,8 +185,8 @@ NSResolver >> resolveWith: aCollectionOfResolver [
 		execute: [ aCollectionOfResolver
 				do: [ :solver | 
 					solver resolve: self.
-					self check.
-					self isResolved ifTrue: [ ^ self ] ] ]
+					self isResolved ifTrue: [ ^ self ] ].
+			self check ]
 		recordedAs: 'Pass ' , resolutionPass asString.
 	resolutionPass := resolutionPass + 1
 ]

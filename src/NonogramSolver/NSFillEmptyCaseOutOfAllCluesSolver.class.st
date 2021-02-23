@@ -1,7 +1,7 @@
 Class {
 	#name : #NSFillEmptyCaseOutOfAllCluesSolver,
 	#superclass : #NSAbstractSolver,
-	#category : #NonogramSolver
+	#category : #'NonogramSolver-Solvers'
 }
 
 { #category : #accessing }

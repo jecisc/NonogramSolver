@@ -1,7 +1,7 @@
 Class {
 	#name : #NSFilledState,
 	#superclass : #NSAbstractCaseState,
-	#category : #NonogramSolver
+	#category : #'NonogramSolver-Model'
 }
 
 { #category : #testing }

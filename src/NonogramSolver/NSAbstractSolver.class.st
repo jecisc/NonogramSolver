@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'resolver'
 	],
-	#category : #NonogramSolver
+	#category : #'NonogramSolver-Solvers'
 }
 
 { #category : #testing }

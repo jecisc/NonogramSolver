@@ -1,7 +1,13 @@
+"
+Description
+--------------------
+
+I am a solver checking if a line is empty. In that case I'll fill it with empty cases.
+"
 Class {
 	#name : #NSAllEmptyFilledSolver,
 	#superclass : #NSAbstractSolver,
-	#category : #NonogramSolver
+	#category : #'NonogramSolver-Solvers'
 }
 
 { #category : #testing }

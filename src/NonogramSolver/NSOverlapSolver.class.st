@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'counter'
 	],
-	#category : #NonogramSolver
+	#category : #'NonogramSolver-Solvers'
 }
 
 { #category : #accessing }

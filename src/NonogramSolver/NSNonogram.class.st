@@ -6,5 +6,5 @@ Class {
 		'verticalClues',
 		'grid'
 	],
-	#category : #NonogramSolver
+	#category : #'NonogramSolver-Model'
 }

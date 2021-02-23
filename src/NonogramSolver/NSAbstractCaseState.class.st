@@ -1,7 +1,7 @@
 Class {
 	#name : #NSAbstractCaseState,
 	#superclass : #Object,
-	#category : #NonogramSolver
+	#category : #'NonogramSolver-Model'
 }
 
 { #category : #testing }

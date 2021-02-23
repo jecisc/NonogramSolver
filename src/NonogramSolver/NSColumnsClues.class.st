@@ -1,7 +1,7 @@
 Class {
 	#name : #NSColumnsClues,
 	#superclass : #NSCluesList,
-	#category : #NonogramSolver
+	#category : #'NonogramSolver-Model'
 }
 
 { #category : #initialization }

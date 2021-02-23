@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'fromBegining'
 	],
-	#category : #NonogramSolver
+	#category : #'NonogramSolver-Solvers'
 }
 
 { #category : #accessing }
