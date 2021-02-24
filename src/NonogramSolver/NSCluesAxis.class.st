@@ -54,79 +54,6 @@ NSCluesAxis >> banIntervalOf: aNSClue [
 			index > indexOfSolvedClue ifTrue: [ clue ban: (1 to: aNSClue possibleInterval max + 1) ] ]
 ]
 
-{ #category : #checking }
-NSCluesAxis >> check [
-	self isResolved ifTrue: [ ^ self ].
-
-	self checkIfCloseFilledIntervalsCanBeJoined.
-	self checkIfUniquePossibleIntervalIsSmallerThanTwiceTheClueValue.
-	self checkFilleIntervalNextToEmptyCaseWatchingTwoCluesCanAddAnEmptyCase.
-	clues do: #check.
-	self checkIfAllCluesAreSolvedThatTheAxeIsResolved
-]
-
-{ #category : #checking }
-NSCluesAxis >> checkFilleIntervalNextToEmptyCaseWatchingTwoCluesCanAddAnEmptyCase [
-	| axis emptyCases |
-	axis := self gridAxis.
-	"Add also the borders of the axis."
-	emptyCases := axis emptyIntervals flattened asOrderedCollection
-		addFirst: 0;
-		addLast: self axisSize + 1;
-		yourself.
-	axis filledIntervals
-		do: [ :filledInterval | 
-			(self unresolvedClues select: [ :clue | clue canIncludeAll: filledInterval ])
-				ifNotEmpty: [ :matchingClues | 
-					matchingClues size = 2
-						ifTrue: [ | maxValue |
-							maxValue := (matchingClues collect: #value) max.
-
-							((emptyCases includes: filledInterval min - 1)
-								and: [ (emptyCases includes: filledInterval max + 1) not
-										and: [ matchingClues first >= matchingClues second
-												and: [ matchingClues includesAll: (clues select: [ :clue | clue canInclude: filledInterval min + maxValue ]) ] ] ])
-								ifTrue: [ self inGridAt: filledInterval min + maxValue put: NSEmptyState ].
-
-							((emptyCases includes: filledInterval max + 1)
-								and: [ (emptyCases includes: filledInterval min - 1) not
-										and: [ matchingClues second >= matchingClues first
-												and: [ matchingClues includesAll: (clues select: [ :clue | clue canInclude: filledInterval max - maxValue ]) ] ] ])
-								ifTrue: [ self inGridAt: filledInterval max - maxValue put: NSEmptyState ] ] ] ]
-]
-
-{ #category : #checking }
-NSCluesAxis >> checkIfAllCluesAreSolvedThatTheAxeIsResolved [
-	(self unresolvedClues isEmpty and: [ self isResolved not ])
-		ifTrue: [ self gridAxis doWithIndex: [ :state :index | state isKnown ifFalse: [ self inGridAt: index put: NSEmptyState ] ] ]
-]
-
-{ #category : #checking }
-NSCluesAxis >> checkIfCloseFilledIntervalsCanBeJoined [
-	"1 2 1 | | | |o| |o| | | | | | |
-	can be:
-	1 2 1 | | | |o|x|o| | | | | | |"
-
-	self gridAxis filledIntervals
-		overlappingPairsDo: [ :filledInterval1 :filledInterval2 | 
-			filledInterval2 min - filledInterval1 max = 2
-				ifTrue: [ ((self unresolvedClues select: [ :clue | (clue canIncludeAll: filledInterval1) and: [ clue canIncludeAll: filledInterval2 ] ])
-						ifEmpty: [ true ]
-						ifNotEmpty: [ :matchingClues | (filledInterval1 min to: filledInterval2 max) size > matchingClues max ])
-						ifTrue: [ self inGridAt: filledInterval1 max + 1 put: NSEmptyState ] ] ]
-]
-
-{ #category : #checking }
-NSCluesAxis >> checkIfUniquePossibleIntervalIsSmallerThanTwiceTheClueValue [
-	self unresolvedClues
-		do: [ :clue | 
-			clue possibleIntervals size = 1
-				ifTrue: [ | possibleInterval |
-					possibleInterval := clue possibleInterval.
-					((possibleInterval min to: possibleInterval min + clue - 1) intersection: (possibleInterval max - clue + 1 to: possibleInterval max))
-						ifNotEmpty: [ :intersection | intersection do: [ :index | self inGridAt: index put: NSFilledState ] ] ] ]
-]
-
 { #category : #accessing }
 NSCluesAxis >> clues [
 	^ clues
@@ -157,7 +84,7 @@ NSCluesAxis >> do: aBlockClosure [
 	clues do: aBlockClosure
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #enumerating }
 NSCluesAxis >> doWithIndex: aBlockClosure [ 
 	^ clues doWithIndex: aBlockClosure
 ]
@@ -213,12 +140,12 @@ NSCluesAxis >> initialize [
 	clues := OrderedCollection new
 ]
 
-{ #category : #enumeration }
+{ #category : #enumerating }
 NSCluesAxis >> inject: aCollection into: aBlockClosure [ 
 	^ clues inject: aCollection into: aBlockClosure 
 ]
 
-{ #category : #checking }
+{ #category : #testing }
 NSCluesAxis >> isResolved [
 	^ self
 		ifLineClues: [ self grid lineIsAllKnown: self index ]

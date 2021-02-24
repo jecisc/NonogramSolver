@@ -33,11 +33,6 @@ NSCluesList >> buildFrom: aXMLElement [
 	^ self subclassResponsibility
 ]
 
-{ #category : #checking }
-NSCluesList >> check [
-	cluesAxis do: #check
-]
-
 { #category : #accessing }
 NSCluesList >> cluesAxis [
 	^ cluesAxis

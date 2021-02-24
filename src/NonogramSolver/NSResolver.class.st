@@ -103,14 +103,6 @@ NSResolver >> at: anInteger at: anInteger2 put: aState [
 	grid at: anInteger at: anInteger2 put: aState 
 ]
 
-{ #category : #checking }
-NSResolver >> check [
-	"Between two resolvers, check the clues to see if we can resolve some things. For example, if all their possible intervals are filled, then it means it is solved."
-
-	verticalClues check.
-	horizontalClues check.
-]
-
 { #category : #accessing }
 NSResolver >> clueForColumn: columnIndex [
 	^ horizontalClues at: columnIndex
@@ -185,8 +177,7 @@ NSResolver >> resolveWith: aCollectionOfResolver [
 		execute: [ aCollectionOfResolver
 				do: [ :solver | 
 					solver resolve: self.
-					self isResolved ifTrue: [ ^ self ] ].
-			self check ]
+					self isResolved ifTrue: [ ^ self ] ] ]
 		recordedAs: 'Pass ' , resolutionPass asString.
 	resolutionPass := resolutionPass + 1
 ]

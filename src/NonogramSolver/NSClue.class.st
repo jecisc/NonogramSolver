@@ -30,6 +30,15 @@ NSClue >> < aNSClue [
 	^ value < aNSClue 
 ]
 
+{ #category : #comparing }
+NSClue >> = anObject [ 
+	"Answer whether the receiver and the argument represent the same 
+	object. If = is redefined in any subclass, consider also redefining the 
+	message hash."
+
+	^self == anObject 
+]
+
 { #category : #'as yet unclassified' }
 NSClue >> adaptToNumber: receiver andSend: aSelector [
 	^ receiver perform: aSelector with: value
@@ -89,11 +98,6 @@ NSClue >> canIncludeAll: aCollection [
 { #category : #testing }
 NSClue >> canIncludeAny: aCollection [
 	^ self possibleIntervals anySatisfy: [ :int | int includesAny: aCollection ]
-]
-
-{ #category : #checking }
-NSClue >> check [
-	self checkIsSolved
 ]
 
 { #category : #checking }

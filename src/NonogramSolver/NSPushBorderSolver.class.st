@@ -1,9 +1,6 @@
 Class {
 	#name : #NSPushBorderSolver,
 	#superclass : #NSAbstractSolver,
-	#instVars : [
-		'fromBegining'
-	],
 	#category : #'NonogramSolver-Solvers'
 }
 
