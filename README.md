@@ -1,7 +1,7 @@
 # NonogramSolver
 A solver of nonograms for https://www.nonograms.org
 
-This is a work in progress. Some nonogram will be solved but not all of them.
+This is a work in progress. Some nonogram will be solved but not all of them. It's almost finished but I am too lazy to implement the guess startegy I have in mind for the few ones I cannot solve with strategies
 
 
 ## Installation
